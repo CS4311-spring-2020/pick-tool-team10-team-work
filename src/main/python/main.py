@@ -1,4 +1,5 @@
 from ProjectConfigWindow import ProjectConfigWindow
+from GraphTableWindow import GraphTableWindow
 
 from PyQt5.QtCore import *
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
@@ -50,7 +51,12 @@ class MainApp(QMainWindow):
         self.window.show()
 
     def on_exisproj_button_clicked(self):
-        print('no')
+        self.hide()
+        MainWindow = QMainWindow()
+        ui = GraphTableWindow()
+        ui.setupUi(MainWindow)
+        self.window = MainWindow
+        self.window.show()
 
 if __name__ == '__main__':
     appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
