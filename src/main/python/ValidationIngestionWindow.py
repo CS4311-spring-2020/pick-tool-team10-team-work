@@ -1,6 +1,7 @@
+from NavigatorWindow import NavigatorWindow
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-                            QHeaderView, QFrame, QTreeWidget, QTreeWidgetItem, QPlainTextEdit)
+                            QHeaderView, QFrame, QTreeWidget, QTreeWidgetItem, QPlainTextEdit, QDialog)
 
 class ValidationIngestionWindow(QMainWindow):
     def __init__(self):
@@ -225,6 +226,7 @@ class ValidationIngestionWindow(QMainWindow):
         nontoingestbutt = QPushButton('Move all Non-Ingestible Log Entries into Ingestible')
         discardbutt = QPushButton('Discard All Non-Ingestible Log Entries')
         ingestbutt = QPushButton('Ingest Log Entries and Continue to Navigator')
+        ingestbutt.clicked.connect(self.on_ingest_button_clicked)
 
         preingestionlayout.addStretch()
         preingestionlayout.addWidget(nontoingestbutt)
@@ -245,6 +247,16 @@ class ValidationIngestionWindow(QMainWindow):
         mainlayout.addWidget(hline3)
         mainlayout.addLayout(preingestionlayout)
         mainwidget.setLayout(mainlayout)
+
+    def on_ingest_button_clicked(self):
+        self.hide()
+        #Due to NavigatorWindow being created through designer I had to call the window as follows
+        Dialog = QDialog()
+        ui = NavigatorWindow()
+        ui.setupUi(Dialog)
+        self.window = Dialog
+        self.window.show()
+
 
     def create_table(self, tablewidget, headerlabels):
         tablewidget.setRowCount(10)
