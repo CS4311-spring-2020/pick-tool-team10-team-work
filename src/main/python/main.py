@@ -1,5 +1,5 @@
-from ProjectConfigWindow import ProjectConfigWindow
-from GraphTableWindow import GraphTableWindow
+from Windows.ProjectConfigWindow import ProjectConfigWindow
+from Windows.GraphTableWindow import GraphTableWindow
 
 from PyQt5.QtCore import *
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
