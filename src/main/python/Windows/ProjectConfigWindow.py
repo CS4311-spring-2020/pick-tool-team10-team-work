@@ -1,6 +1,8 @@
 from .ValidationIngestionWindow import ValidationIngestionWindow
 from Dialogs.DirDialog import DirDialog
+from Dialogs.CalendarDialog import CalendarDialog
 
+#from QtGui import QCalendarWidget
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QStyle
 
@@ -9,7 +11,7 @@ class ProjectConfigWindow(QMainWindow):
         super().__init__()
         self.completed = 0
         self.setWindowTitle('Project Configuration')
-        self.setFixedSize(500, 340)
+        self.setFixedSize(550, 340)
         mainwidget = QWidget()
         self.setCentralWidget(mainwidget)
         mainlayout = QVBoxLayout()
@@ -52,7 +54,7 @@ class ProjectConfigWindow(QMainWindow):
         rootpathlayout.addWidget(rootpathbutt)
 
         path1label = QLabel('Name of folder inside root path:')
-        self.path1ledit = QLineEdit('Name of folder 1 goes here.')
+        self.path1ledit = QLineEdit('Directory path of folder 1 goes here.')
         path1butt = QPushButton()
         path1butt.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_DirOpenIcon')))
         path1butt.clicked.connect(self.on_path1dir_button_clicked)
@@ -62,7 +64,7 @@ class ProjectConfigWindow(QMainWindow):
         path1layout.addWidget(path1butt)
 
         path2label = QLabel('Name of folder inside root path:')
-        self.path2ledit = QLineEdit('Name of folder 2 goes here.')
+        self.path2ledit = QLineEdit('Directory path of folder 2 goes here.')
         path2butt = QPushButton()
         path2butt.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_DirOpenIcon')))
         path2butt.clicked.connect(self.on_path2dir_button_clicked)
@@ -72,7 +74,7 @@ class ProjectConfigWindow(QMainWindow):
         path2layout.addWidget(path2butt)
 
         path3label = QLabel('Name of folder inside root path:')
-        self.path3ledit = QLineEdit('Name of folder 3 goes here.')
+        self.path3ledit = QLineEdit('Directory path of folder 3 goes here.')
         path3butt = QPushButton()
         path3butt.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_DirOpenIcon')))
         path3butt.clicked.connect(self.on_path3dir_button_clicked)
@@ -87,32 +89,51 @@ class ProjectConfigWindow(QMainWindow):
         datetitlelayout.addWidget(eventdatelabel)
         datetitlelayout.addStretch()
 
-        startdatelabel = QLabel('Start Date: ')
-        startdateledit = QLineEdit()
+        #startdatelabel = QLabel('Start Date: ')
+        #startdateledit = QLineEdit()
+        startdatebutt = QPushButton('Select a start date.')
+        startdatebutt.clicked.connect(self.on_startdate_button_clicked)
+        self.selectstartdatelabel = QLabel('No Start Date Selected')
 
-        startdatelayout.addWidget(startdatelabel)
-        startdatelayout.addWidget(startdateledit)
+        #startdatelayout.addWidget(startdatelabel)
+        startdatelayout.addStretch()
+        startdatelayout.addWidget(startdatebutt)
+        startdatelayout.addStretch()
+        #startdatelayout.addWidget(self.selectstartdatelabel)
+        #startdatelayout.addWidget(startdateledit)
 
-        starttimelabel = QLabel('Start Time: ')
-        starttimeledit = QLineEdit()
+        #starttimelabel = QLabel('Start Time: ')
+        #starttimeledit = QLineEdit()
 
-        starttimelayout.addWidget(starttimelabel)
-        starttimelayout.addWidget(starttimeledit)
+        #starttimelayout.addWidget(starttimelabel)
+        #starttimelayout.addWidget(starttimeledit)
+        starttimelayout.addStretch()
+        starttimelayout.addWidget(self.selectstartdatelabel)
+        starttimelayout.addStretch()
 
         startcontainerlayout.addLayout(startdatelayout)
         startcontainerlayout.addLayout(starttimelayout)
 
-        enddatelabel = QLabel('End Date: ')
-        enddateledit = QLineEdit()
+        #enddatelabel = QLabel('End Date: ')
+        #enddateledit = QLineEdit()
+        enddatebutt = QPushButton('Select a end date.')
+        enddatebutt.clicked.connect(self.on_enddate_button_clicked)
+        self.selectenddatelabel = QLabel('No End Date Selected')
 
-        enddatelayout.addWidget(enddatelabel)
-        enddatelayout.addWidget(enddateledit)
+        #enddatelayout.addWidget(enddatelabel)
+        #enddatelayout.addWidget(enddateledit)
+        enddatelayout.addStretch()
+        enddatelayout.addWidget(enddatebutt)
+        enddatelayout.addStretch()
 
-        endtimelabel = QLabel('End Time: ')
-        endtimeledit = QLineEdit()
+        #endtimelabel = QLabel('End Time: ')
+        #endtimeledit = QLineEdit()
 
-        endtimelayout.addWidget(endtimelabel)
-        endtimelayout.addWidget(endtimeledit)
+        #endtimelayout.addWidget(endtimelabel)
+        #endtimelayout.addWidget(endtimeledit)
+        endtimelayout.addStretch()
+        endtimelayout.addWidget(self.selectenddatelabel)
+        endtimelayout.addStretch()
 
         endcontainerlayout.addLayout(enddatelayout)
         endcontainerlayout.addLayout(endtimelayout)
@@ -154,6 +175,18 @@ class ProjectConfigWindow(QMainWindow):
     def on_path3dir_button_clicked(self):
         dir_chosen = DirDialog().dir_dialog('Choose the path of folder 3')
         self.path3ledit.setText(dir_chosen)
+
+    def on_startdate_button_clicked(self):
+        calwindow = CalendarDialog(self)
+        calwindow.exec_()
+        datechosen =  calwindow.date_picked
+        self.selectstartdatelabel.setText('Start Date Selected: ' + datechosen)
+
+    def on_enddate_button_clicked(self):
+        calwindow = CalendarDialog(self)
+        calwindow.exec_()
+        datechosen =  calwindow.date_picked
+        self.selectenddatelabel.setText('Start Date Selected: ' + datechosen)
 
     def on_config_button_clicked(self):
         self.hide()
