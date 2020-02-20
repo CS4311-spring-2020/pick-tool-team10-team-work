@@ -42,6 +42,7 @@ class ValidationIngestionWindow(QMainWindow):
         logentrytimelayout = QHBoxLayout()
         logentrypathlayout = QHBoxLayout()
         logentryboxlayout = QHBoxLayout()
+        logentrybuttlayout = QHBoxLayout()
         preingestionlayout = QHBoxLayout()
 
         hline1 = QFrame()
@@ -213,12 +214,19 @@ class ValidationIngestionWindow(QMainWindow):
         logentryboxlayout.addWidget(logentrydataptedit)
         logentryboxlayout.addStretch()
 
+        logentrydelbutt = QPushButton('Delete Log Entry')
+
+        logentrybuttlayout.addStretch()
+        logentrybuttlayout.addWidget(logentrydelbutt)
+        logentrybuttlayout.addStretch()
+
         logentrycontainerlayout.addLayout(logentryinfolayout)
         logentrycontainerlayout.addLayout(logentrynamelayout)
         logentrycontainerlayout.addLayout(logentryteamlayout)
         logentrycontainerlayout.addLayout(logentrytimelayout)
         logentrycontainerlayout.addLayout(logentrypathlayout)
         logentrycontainerlayout.addLayout(logentryboxlayout)
+        logentrycontainerlayout.addLayout(logentrybuttlayout)
 
         logcontainergrid.addLayout(ingestioncontainerlayout, 0, 0)
         logcontainergrid.addLayout(logentrycontainerlayout, 0, 1)
