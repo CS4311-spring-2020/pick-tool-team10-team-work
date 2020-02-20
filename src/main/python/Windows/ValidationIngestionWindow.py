@@ -1,4 +1,4 @@
-from .NavigatorWindow import NavigatorWindow
+from .mainwindow_nav import Ui_mainwindow_navigation
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
                             QHeaderView, QFrame, QTreeWidget, QTreeWidgetItem, QPlainTextEdit, QDialog)
@@ -42,6 +42,7 @@ class ValidationIngestionWindow(QMainWindow):
         logentrytimelayout = QHBoxLayout()
         logentrypathlayout = QHBoxLayout()
         logentryboxlayout = QHBoxLayout()
+        logentrybuttlayout = QHBoxLayout()
         preingestionlayout = QHBoxLayout()
 
         hline1 = QFrame()
@@ -213,12 +214,19 @@ class ValidationIngestionWindow(QMainWindow):
         logentryboxlayout.addWidget(logentrydataptedit)
         logentryboxlayout.addStretch()
 
+        logentrydelbutt = QPushButton('Delete Log Entry')
+
+        logentrybuttlayout.addStretch()
+        logentrybuttlayout.addWidget(logentrydelbutt)
+        logentrybuttlayout.addStretch()
+
         logentrycontainerlayout.addLayout(logentryinfolayout)
         logentrycontainerlayout.addLayout(logentrynamelayout)
         logentrycontainerlayout.addLayout(logentryteamlayout)
         logentrycontainerlayout.addLayout(logentrytimelayout)
         logentrycontainerlayout.addLayout(logentrypathlayout)
         logentrycontainerlayout.addLayout(logentryboxlayout)
+        logentrycontainerlayout.addLayout(logentrybuttlayout)
 
         logcontainergrid.addLayout(ingestioncontainerlayout, 0, 0)
         logcontainergrid.addLayout(logentrycontainerlayout, 0, 1)
@@ -250,11 +258,11 @@ class ValidationIngestionWindow(QMainWindow):
 
     def on_ingest_button_clicked(self):
         self.hide()
-        #Due to NavigatorWindow being created through designer I had to call the window as follows
-        Dialog = QDialog()
-        ui = NavigatorWindow()
-        ui.setupUi(Dialog)
-        self.window = Dialog
+        #Due to mainwindow_nav being created through designer I had to call the window as follows
+        MainWindow = QMainWindow()
+        ui = Ui_mainwindow_navigation()
+        ui.setupUi(MainWindow)
+        self.window = MainWindow
         self.window.show()
 
 
