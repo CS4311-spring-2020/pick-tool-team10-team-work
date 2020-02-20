@@ -1,5 +1,5 @@
 from Windows.ProjectConfigWindow import ProjectConfigWindow
-from Windows.GraphTableWindow import GraphTableWindow
+from Windows.mainwindow_vectortableview import Ui_mainwindow_vectortableview
 
 from PyQt5.QtCore import *
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
@@ -53,7 +53,7 @@ class MainApp(QMainWindow):
     def on_exisproj_button_clicked(self):
         self.hide()
         MainWindow = QMainWindow()
-        ui = GraphTableWindow()
+        ui = Ui_mainwindow_vectortableview()
         ui.setupUi(MainWindow)
         self.window = MainWindow
         self.window.show()
