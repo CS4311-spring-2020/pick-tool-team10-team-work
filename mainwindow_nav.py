@@ -8,13 +8,16 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtWidgets import QStyleFactory, QAbstractItemView, QMainWindow
 
 
-class Ui_mainwindow_navigation(object):
-    def setupUi(self, mainwindow_navigation):
-        mainwindow_navigation.setObjectName("mainwindow_navigation")
-        mainwindow_navigation.resize(787, 582)
-        self.centralwidget_allwindow_nav = QtWidgets.QWidget(mainwindow_navigation)
+class Ui_mainwindow_navigation(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setObjectName("mainwindow_navigation")
+        self.resize(787, 582)
+        self.centralwidget_allwindow_nav = QtWidgets.QWidget(self)
         self.centralwidget_allwindow_nav.setObjectName("centralwidget_allwindow_nav")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget_allwindow_nav)
         self.gridLayout.setObjectName("gridLayout")
@@ -95,8 +98,8 @@ class Ui_mainwindow_navigation(object):
         self.hl_bottom_navi = QtWidgets.QHBoxLayout()
         self.hl_bottom_navi.setObjectName("hl_bottom_navi")
         self.scrollarea01_hl_bottom_navi = QtWidgets.QScrollArea(self.centralwidget_allwindow_nav)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(5)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(2)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.scrollarea01_hl_bottom_navi.sizePolicy().hasHeightForWidth())
         self.scrollarea01_hl_bottom_navi.setSizePolicy(sizePolicy)
@@ -104,7 +107,7 @@ class Ui_mainwindow_navigation(object):
         self.scrollarea01_hl_bottom_navi.setWidgetResizable(True)
         self.scrollarea01_hl_bottom_navi.setObjectName("scrollarea01_hl_bottom_navi")
         self.scrollareacontentwidgets_hl_bottom_navi = QtWidgets.QWidget()
-        self.scrollareacontentwidgets_hl_bottom_navi.setGeometry(QtCore.QRect(0, 0, 233, 768))
+        self.scrollareacontentwidgets_hl_bottom_navi.setGeometry(QtCore.QRect(0, 0, 209, 773))
         self.scrollareacontentwidgets_hl_bottom_navi.setObjectName("scrollareacontentwidgets_hl_bottom_navi")
         self.gridLayout_8 = QtWidgets.QGridLayout(self.scrollareacontentwidgets_hl_bottom_navi)
         self.gridLayout_8.setObjectName("gridLayout_8")
@@ -119,8 +122,7 @@ class Ui_mainwindow_navigation(object):
         sizePolicy.setHeightForWidth(self.label_location_navi.sizePolicy().hasHeightForWidth())
         self.label_location_navi.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
-        font.setFamily("Segoe UI Semibold")
-        font.setPointSize(12)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.label_location_navi.setFont(font)
@@ -134,6 +136,18 @@ class Ui_mainwindow_navigation(object):
         self.listview_location_navi.setSizePolicy(sizePolicy)
         self.listview_location_navi.setMinimumSize(QtCore.QSize(0, 75))
         self.listview_location_navi.setObjectName("listview_location_navi")
+
+        self.listview_location_navi.setEditTriggers(QAbstractItemView.DoubleClicked)
+        self.model = QStandardItemModel()
+        self.model.itemChanged.connect(self.set_items)
+        for n in range(10):
+            item = QStandardItem('Item %s' % n)
+            item.setCheckable(True)
+            item.setEditable(True)
+            self.model.appendRow(item)
+        self.listview_location_navi.setModel(self.model)
+
+
         self.vl_locationfilter_navi.addWidget(self.listview_location_navi)
         self.vl_allfilters_navi.addLayout(self.vl_locationfilter_navi)
         self.line05_hl_bottom_navi = QtWidgets.QFrame(self.scrollareacontentwidgets_hl_bottom_navi)
@@ -152,7 +166,7 @@ class Ui_mainwindow_navigation(object):
         sizePolicy.setHeightForWidth(self.label_showhide_navi.sizePolicy().hasHeightForWidth())
         self.label_showhide_navi.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
-        font.setPointSize(14)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.label_showhide_navi.setFont(font)
@@ -232,6 +246,12 @@ class Ui_mainwindow_navigation(object):
         self.button_timefilter_navi.setObjectName("button_timefilter_navi")
         self.vl_timefilter_navi.addWidget(self.button_timefilter_navi)
         self.listview_timefilter_navi = QtWidgets.QListView(self.scrollareacontentwidgets_hl_bottom_navi)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.listview_timefilter_navi.sizePolicy().hasHeightForWidth())
+        self.listview_timefilter_navi.setSizePolicy(sizePolicy)
+        self.listview_timefilter_navi.setMinimumSize(QtCore.QSize(0, 75))
         self.listview_timefilter_navi.setObjectName("listview_timefilter_navi")
         self.vl_timefilter_navi.addWidget(self.listview_timefilter_navi)
         self.vl_allfilters_navi.addLayout(self.vl_timefilter_navi)
@@ -313,7 +333,7 @@ class Ui_mainwindow_navigation(object):
         self.hl_bottom_navi.addItem(spacerItem6)
         self.tablewidget_navi = QtWidgets.QTableWidget(self.centralwidget_allwindow_nav)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(10)
+        sizePolicy.setHorizontalStretch(8)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tablewidget_navi.sizePolicy().hasHeightForWidth())
         self.tablewidget_navi.setSizePolicy(sizePolicy)
@@ -373,17 +393,17 @@ class Ui_mainwindow_navigation(object):
         self.hl_bottom_navi.addWidget(self.tablewidget_navi)
         self.vl_allwindow_navi.addLayout(self.hl_bottom_navi)
         self.gridLayout.addLayout(self.vl_allwindow_navi, 0, 0, 1, 1)
-        mainwindow_navigation.setCentralWidget(self.centralwidget_allwindow_nav)
-        self.menubar = QtWidgets.QMenuBar(mainwindow_navigation)
+        self.setCentralWidget(self.centralwidget_allwindow_nav)
+        self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 787, 22))
         self.menubar.setObjectName("menubar")
-        mainwindow_navigation.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(mainwindow_navigation)
+        self.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
-        mainwindow_navigation.setStatusBar(self.statusbar)
+        self.setStatusBar(self.statusbar)
 
-        self.retranslateUi(mainwindow_navigation)
-        QtCore.QMetaObject.connectSlotsByName(mainwindow_navigation)
+        self.retranslateUi(self)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self, mainwindow_navigation):
         _translate = QtCore.QCoreApplication.translate
@@ -452,11 +472,15 @@ class Ui_mainwindow_navigation(object):
         item.setText(_translate("mainwindow_navigation", "Vector"))
 
 
+    def set_items(self, item):
+        print(item.text() + " " + str(item.checkState()))
+
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    mainwindow_navigation = QtWidgets.QMainWindow()
+    app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+    app.setStyle(QStyleFactory.create('Fusion'))
     ui = Ui_mainwindow_navigation()
-    ui.setupUi(mainwindow_navigation)
-    mainwindow_navigation.show()
+    ui.show()
     sys.exit(app.exec_())
