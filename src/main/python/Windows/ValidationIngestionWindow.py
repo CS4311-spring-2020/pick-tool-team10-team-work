@@ -259,10 +259,17 @@ class ValidationIngestionWindow(QMainWindow):
     def on_ingest_button_clicked(self):
         self.hide()
         #Due to mainwindow_nav being created through designer I had to call the window as follows
+<<<<<<< HEAD
         MainWindow = QMainWindow()
         ui = Ui_mainwindow_navigation()
         ui.setupUi(MainWindow)
         self.window = MainWindow
+=======
+        #MainWindow = QMainWindow()
+        #ui = Ui_mainwindow_navigation()
+        #ui.setupUi(MainWindow)
+        self.window = Ui_mainwindow_navigation()
+>>>>>>> Charlie
         self.window.show()
 
 
