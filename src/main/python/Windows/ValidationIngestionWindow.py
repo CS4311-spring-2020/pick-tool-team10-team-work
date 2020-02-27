@@ -1,4 +1,4 @@
-from .NavigatorWindow import NavigatorWindow
+from .mainwindow_nav import Ui_mainwindow_navigation
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
                             QHeaderView, QFrame, QTreeWidget, QTreeWidgetItem, QPlainTextEdit, QDialog)
@@ -258,11 +258,11 @@ class ValidationIngestionWindow(QMainWindow):
 
     def on_ingest_button_clicked(self):
         self.hide()
-        #Due to NavigatorWindow being created through designer I had to call the window as follows
-        Dialog = QDialog()
-        ui = NavigatorWindow()
-        ui.setupUi(Dialog)
-        self.window = Dialog
+        #Due to mainwindow_nav being created through designer I had to call the window as follows
+        #MainWindow = QMainWindow()
+        #ui = Ui_mainwindow_navigation()
+        #ui.setupUi(MainWindow)
+        self.window = Ui_mainwindow_navigation()
         self.window.show()
 
 
