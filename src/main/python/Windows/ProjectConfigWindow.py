@@ -1,8 +1,9 @@
 from .ValidationIngestionWindow import ValidationIngestionWindow
 from Dialogs.DirDialog import DirDialog
 from Dialogs.CalendarDialog import CalendarDialog
+from os import path
 
-#from QtGui import QCalendarWidget
+#from PyQt5.QtCore import QDate
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QStyle
 
@@ -89,24 +90,14 @@ class ProjectConfigWindow(QMainWindow):
         datetitlelayout.addWidget(eventdatelabel)
         datetitlelayout.addStretch()
 
-        #startdatelabel = QLabel('Start Date: ')
-        #startdateledit = QLineEdit()
         startdatebutt = QPushButton('Select a start date.')
         startdatebutt.clicked.connect(self.on_startdate_button_clicked)
         self.selectstartdatelabel = QLabel('No Start Date Selected')
 
-        #startdatelayout.addWidget(startdatelabel)
         startdatelayout.addStretch()
         startdatelayout.addWidget(startdatebutt)
         startdatelayout.addStretch()
-        #startdatelayout.addWidget(self.selectstartdatelabel)
-        #startdatelayout.addWidget(startdateledit)
 
-        #starttimelabel = QLabel('Start Time: ')
-        #starttimeledit = QLineEdit()
-
-        #starttimelayout.addWidget(starttimelabel)
-        #starttimelayout.addWidget(starttimeledit)
         starttimelayout.addStretch()
         starttimelayout.addWidget(self.selectstartdatelabel)
         starttimelayout.addStretch()
@@ -114,23 +105,14 @@ class ProjectConfigWindow(QMainWindow):
         startcontainerlayout.addLayout(startdatelayout)
         startcontainerlayout.addLayout(starttimelayout)
 
-        #enddatelabel = QLabel('End Date: ')
-        #enddateledit = QLineEdit()
         enddatebutt = QPushButton('Select a end date.')
         enddatebutt.clicked.connect(self.on_enddate_button_clicked)
         self.selectenddatelabel = QLabel('No End Date Selected')
 
-        #enddatelayout.addWidget(enddatelabel)
-        #enddatelayout.addWidget(enddateledit)
         enddatelayout.addStretch()
         enddatelayout.addWidget(enddatebutt)
         enddatelayout.addStretch()
 
-        #endtimelabel = QLabel('End Time: ')
-        #endtimeledit = QLineEdit()
-
-        #endtimelayout.addWidget(endtimelabel)
-        #endtimelayout.addWidget(endtimeledit)
         endtimelayout.addStretch()
         endtimelayout.addWidget(self.selectenddatelabel)
         endtimelayout.addStretch()
@@ -160,30 +142,65 @@ class ProjectConfigWindow(QMainWindow):
         mainlayout.addStretch()
         mainwidget.setLayout(mainlayout)
 
+    def writedata(self, location, dir_chosen):
+        basepath = path.dirname(__file__)
+        filepath = path.abspath(path.join(basepath, "../Data", "ProjectConfigData.txt"))
+        with open(filepath, 'r') as file:
+            # read a list of lines into data
+            data = file.readlines()
+
+        if location == 0:
+            data[0] = dir_chosen + '\n'
+            #print("root path: " + data[0])
+        elif location == 1:
+            data[1] = dir_chosen + '\n'
+            #print("dir1 path: " + data[1])
+        elif location == 2:
+            data[2] = dir_chosen + '\n'
+            #print("dir2 path: " + data[2])
+        elif location == 3:
+            data[3] = dir_chosen + '\n'
+            #print("dir3 path: " + data[3])
+
+        # and write everything back
+        with open(filepath, 'w') as file:
+            file.writelines( data )
+
     def on_rootdir_button_clicked(self):
         dir_chosen = DirDialog().dir_dialog('Choose the root path:')
         self.rootpathledit.setText(dir_chosen)
+        self.writedata(0, dir_chosen)
 
     def on_path1dir_button_clicked(self):
         dir_chosen = DirDialog().dir_dialog('Choose the path of folder 1')
         self.path1ledit.setText(dir_chosen)
+        self.writedata(1, dir_chosen)
 
     def on_path2dir_button_clicked(self):
         dir_chosen = DirDialog().dir_dialog('Choose the path of folder 2')
         self.path2ledit.setText(dir_chosen)
+        self.writedata(2, dir_chosen)
 
     def on_path3dir_button_clicked(self):
         dir_chosen = DirDialog().dir_dialog('Choose the path of folder 3')
         self.path3ledit.setText(dir_chosen)
+        self.writedata(3, dir_chosen)
 
     def on_startdate_button_clicked(self):
         calwindow = CalendarDialog(self)
         calwindow.exec_()
         datechosen =  calwindow.date_picked
+        self.minimumdate = [calwindow.minimumdatelist[0], int(calwindow.minimumdatelist[1]), int(calwindow.minimumdatelist[2])]
         self.selectstartdatelabel.setText('Start Date Selected: ' + datechosen)
+        print(datechosen)
+        """
+        print(type(self.minimumdate[0]))
+        print(type(self.minimumdate[1]))
+        print(type(self.minimumdate[2]))
+        """
 
     def on_enddate_button_clicked(self):
-        calwindow = CalendarDialog(self)
+        calwindow = CalendarDialog(self, self.minimumdate)
         calwindow.exec_()
         datechosen =  calwindow.date_picked
         self.selectenddatelabel.setText('Start Date Selected: ' + datechosen)

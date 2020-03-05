@@ -1,7 +1,11 @@
 from .mainwindow_nav import Ui_mainwindow_navigation
+from Splunk.SplunkDataSearch import SplunkDataSearch
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
                             QHeaderView, QFrame, QTreeWidget, QTreeWidgetItem, QPlainTextEdit, QDialog)
+
+import subprocess
+import os
 
 class ValidationIngestionWindow(QMainWindow):
     def __init__(self):
@@ -87,12 +91,12 @@ class ValidationIngestionWindow(QMainWindow):
         cleansecontainerlayout.addLayout(cleansestatuslayout)
         cleansecontainerlayout.addStretch()
 
-        cleansetable = QTableWidget()
+        self.cleansetable = QTableWidget()
         cleanseheaderlabels = ['Location/Name', 'Cleansed']
-        self.create_table(cleansetable, cleanseheaderlabels)
+        self.create_table(self.cleansetable, cleanseheaderlabels)
 
         cleansecontainergrid.addLayout(cleansecontainerlayout, 0, 0)
-        cleansecontainergrid.addWidget(cleansetable, 0, 1)
+        cleansecontainergrid.addWidget(self.cleansetable, 0, 1)
 
         validationtitlelabel = QLabel('Validation Overview')
 
@@ -107,6 +111,7 @@ class ValidationIngestionWindow(QMainWindow):
         validationinfolayout.addStretch()
 
         validatebutt = QPushButton('Validate')
+        validatebutt.clicked.connect(self.on_validate_button_clicked)
 
         validationbuttlayout.addStretch()
         validationbuttlayout.addWidget(validatebutt)
@@ -124,12 +129,12 @@ class ValidationIngestionWindow(QMainWindow):
         validationcontainerlayout.addLayout(validationstatuslayout)
         validationcontainerlayout.addStretch()
 
-        validatetable = QTableWidget()
+        self.validatetable = QTableWidget()
         validateheaderlabels = ['Location/Name', 'Validated']
-        self.create_table(validatetable, validateheaderlabels)
+        self.create_table(self.validatetable, validateheaderlabels)
 
         validationcontainergrid.addLayout(validationcontainerlayout, 0, 0)
-        validationcontainergrid.addWidget(validatetable, 0, 1)
+        validationcontainergrid.addWidget(self.validatetable, 0, 1)
 
         logtitlelabel = QLabel('Log Overview')
 
@@ -258,16 +263,35 @@ class ValidationIngestionWindow(QMainWindow):
 
     def on_ingest_button_clicked(self):
         self.hide()
-        #Due to mainwindow_nav being created through designer I had to call the window as follows
-        #MainWindow = QMainWindow()
-        #ui = Ui_mainwindow_navigation()
-        #ui.setupUi(MainWindow)
         self.window = Ui_mainwindow_navigation()
         self.window.show()
 
 
     def create_table(self, tablewidget, headerlabels):
-        tablewidget.setRowCount(10)
+        #testlist = ['/root/Desktop/testing1.txt', '/root/Desktop/testing2.txt', '/root/Desktop/testing3.txt', '/root/Desktop/testing4.txt']
+        dirlist = []
+        filelist = []
+        basepath = os.path.dirname(__file__)
+        filepath = os.path.abspath(os.path.join(basepath, "../Data", "ProjectConfigData.txt"))
+        with open(filepath, 'r') as file:
+            # read a list of lines into data
+            data = file.readlines()
+
+        #remove the root dir for the project
+        del data[0]
+
+        #create list for directories
+        for directory in data:
+            dirlist.append(directory.rstrip())
+
+        #iterate through the list of directories
+        for directory in dirlist:
+            # r=root, d=directories, f = files
+            for r, d, f in os.walk(directory):
+                for file in f:
+                    filelist.append(os.path.join(r, file))
+
+        tablewidget.setRowCount(len(filelist))
         tablewidget.setColumnCount(2)
         tablewidget.setHorizontalHeaderLabels(headerlabels)
         tablewidget.verticalHeader().setVisible(False)
@@ -276,7 +300,8 @@ class ValidationIngestionWindow(QMainWindow):
         for x in range(tablewidget.rowCount()):
             for y in range(tablewidget.columnCount()):
                 if y == 0:
-                    path = '/root/Users/Test/Desktop/Example'+str(x+1)
+                    #path = '/root/Users/Test/Desktop/Example'+str(x+1)
+                    path = filelist[x]
                     item = QTableWidgetItem(path)
                     item.setTextAlignment(Qt.AlignCenter)
                     tablewidget.setItem(x,y, item)
@@ -285,8 +310,20 @@ class ValidationIngestionWindow(QMainWindow):
                     item.setTextAlignment(Qt.AlignCenter)
                     tablewidget.setItem(x,y, item)
 
+    def push_to_splunk(self, tablewidget):
+        for row in range(tablewidget.rowCount()):
+            twi0 = tablewidget.item(row,0)
+            splunkcmd = subprocess.run(["/opt/splunk/bin/splunk", "add", "oneshot", twi0.text()])
+            print("The exit code was: %d" % splunkcmd.returncode)
+            print(twi0.text())
+        test = SplunkDataSearch()
+
     def create_treelist(self, treewidget, data):
         treewidget.setHeaderHidden(True)
         for x in data:
             list_item = QTreeWidgetItem([x])
             treewidget.addTopLevelItem(list_item)
+
+    def on_validate_button_clicked(self):
+        self.push_to_splunk(self.validatetable)
+
