@@ -93,7 +93,7 @@ class ValidationIngestionWindow(QMainWindow):
 
         self.cleansetable = QTableWidget()
         cleanseheaderlabels = ['Location/Name', 'Cleansed']
-        self.create_table(self.cleansetable, cleanseheaderlabels)
+        self.create_table_cleanse(self.cleansetable, cleanseheaderlabels)
 
         cleansecontainergrid.addLayout(cleansecontainerlayout, 0, 0)
         cleansecontainergrid.addWidget(self.cleansetable, 0, 1)
@@ -131,7 +131,7 @@ class ValidationIngestionWindow(QMainWindow):
 
         self.validatetable = QTableWidget()
         validateheaderlabels = ['Location/Name', 'Validated']
-        self.create_table(self.validatetable, validateheaderlabels)
+        self.create_table_validate(self.validatetable, validateheaderlabels)
 
         validationcontainergrid.addLayout(validationcontainerlayout, 0, 0)
         validationcontainergrid.addWidget(self.validatetable, 0, 1)
@@ -148,12 +148,13 @@ class ValidationIngestionWindow(QMainWindow):
         ingestibletitlelayout.addWidget(ingestibletitlelabel)
         ingestibletitlelayout.addStretch()
 
-        ingestibletree = QTreeWidget()
+        self.ingestibletree = QTreeWidget()
         data = ['Log Entry ####', 'Log Entry ####+1', 'Log Entry ####+2', 'Log Entry ####+3', 'Log Entry ####+4', 'Log Entry ####+5', 'Log Entry ####+6', 'Log Entry ####+7', 'Log Entry ####+8']
-        self.create_treelist(ingestibletree, data)
+        self.create_treelist(self.ingestibletree, data)
+        self.ingestibletree.itemSelectionChanged.connect(self.on_ingestitem_selected)
 
         ingestibletreelayout.addStretch()
-        ingestibletreelayout.addWidget(ingestibletree)
+        ingestibletreelayout.addWidget(self.ingestibletree)
         ingestibletreelayout.addStretch()
 
         ingestiblecontainerlayout.addLayout(ingestibletitlelayout)
@@ -165,12 +166,13 @@ class ValidationIngestionWindow(QMainWindow):
         noningestibletitlelayout.addWidget(noningestibletitlelabel)
         noningestibletitlelayout.addStretch()
 
-        noningestibletree = QTreeWidget()
-        nondata = ['Log Entry ####', 'Log Entry ####+1', 'Log Entry ####+2', 'Log Entry ####+3', 'Log Entry ####+4', 'Log Entry ####+5', 'Log Entry ####+6', 'Log Entry ####+7', 'Log Entry ####+8']
-        self.create_treelist(noningestibletree, nondata)
+        self.noningestibletree = QTreeWidget()
+        nondata = ['Log Entry ####+9', 'Log Entry ####+10', 'Log Entry ####+11', 'Log Entry ####+12', 'Log Entry ####+13', 'Log Entry ####+14', 'Log Entry ####+15', 'Log Entry ####+16', 'Log Entry ####+17']
+        self.create_treelist(self.noningestibletree, nondata)
+        self.noningestibletree.itemSelectionChanged.connect(self.on_noningestitem_selected)
 
         noningestibletreelayout.addStretch()
-        noningestibletreelayout.addWidget(noningestibletree)
+        noningestibletreelayout.addWidget(self.noningestibletree)
         noningestibletreelayout.addStretch()
 
         noningestiblecontainerlayout.addLayout(noningestibletitlelayout)
@@ -187,10 +189,10 @@ class ValidationIngestionWindow(QMainWindow):
         logentryinfolayout.addWidget(logentryinfolabel)
         logentryinfolayout.addStretch()
 
-        logentrynamelabel = QLabel('Name: Log Entry ####')
+        self.logentrynamelabel = QLabel('Name: Log Entry ####')
 
         logentrynamelayout.addStretch()
-        logentrynamelayout.addWidget(logentrynamelabel)
+        logentrynamelayout.addWidget(self.logentrynamelabel)
         logentrynamelayout.addStretch()
 
         logentryteamlabel = QLabel('Team: R|B|W')
@@ -261,20 +263,46 @@ class ValidationIngestionWindow(QMainWindow):
         mainlayout.addLayout(preingestionlayout)
         mainwidget.setLayout(mainlayout)
 
-    def on_ingest_button_clicked(self):
-        self.hide()
-        self.window = Ui_mainwindow_navigation()
-        self.window.show()
+    #Create a table widget and populating it with cleansed files
+    def create_table_cleanse(self, tablewidget, headerlabels):
+        filelist = []
+        basepath = os.path.dirname(__file__)
+        filepath = os.path.abspath(os.path.join(basepath, "../Data/CleansedFiles", ""))
+        
+        #iterate through the files in the cleansed folder
+        for r, d, f in os.walk(filepath):
+            for file in f:
+                filelist.append(os.path.join(r, file))
 
+        tablewidget.setRowCount(len(filelist))
+        tablewidget.setColumnCount(2)
+        tablewidget.setHorizontalHeaderLabels(headerlabels)
+        tablewidget.verticalHeader().setVisible(False)
+        header = tablewidget.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
 
-    def create_table(self, tablewidget, headerlabels):
-        #testlist = ['/root/Desktop/testing1.txt', '/root/Desktop/testing2.txt', '/root/Desktop/testing3.txt', '/root/Desktop/testing4.txt']
+        #Populate table
+        for x in range(tablewidget.rowCount()):
+            for y in range(tablewidget.columnCount()):
+                if y == 0:
+                    path = filelist[x]
+                    item = QTableWidgetItem(path)
+                    item.setTextAlignment(Qt.AlignCenter)
+                    tablewidget.setItem(x,y, item)
+                else:
+                    item = QTableWidgetItem('yes')
+                    item.setTextAlignment(Qt.AlignCenter)
+                    tablewidget.setItem(x,y, item)
+
+    #Create a table widget and populating it with validated files
+    def create_table_validate(self, tablewidget, headerlabels):
         dirlist = []
         filelist = []
         basepath = os.path.dirname(__file__)
         filepath = os.path.abspath(os.path.join(basepath, "../Data", "ProjectConfigData.txt"))
+        
+        #read a list of lines into data
         with open(filepath, 'r') as file:
-            # read a list of lines into data
             data = file.readlines()
 
         #remove the root dir for the project
@@ -286,7 +314,6 @@ class ValidationIngestionWindow(QMainWindow):
 
         #iterate through the list of directories
         for directory in dirlist:
-            # r=root, d=directories, f = files
             for r, d, f in os.walk(directory):
                 for file in f:
                     filelist.append(os.path.join(r, file))
@@ -297,10 +324,11 @@ class ValidationIngestionWindow(QMainWindow):
         tablewidget.verticalHeader().setVisible(False)
         header = tablewidget.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.Stretch)
+
+        #Populate table
         for x in range(tablewidget.rowCount()):
             for y in range(tablewidget.columnCount()):
                 if y == 0:
-                    #path = '/root/Users/Test/Desktop/Example'+str(x+1)
                     path = filelist[x]
                     item = QTableWidgetItem(path)
                     item.setTextAlignment(Qt.AlignCenter)
@@ -310,6 +338,7 @@ class ValidationIngestionWindow(QMainWindow):
                     item.setTextAlignment(Qt.AlignCenter)
                     tablewidget.setItem(x,y, item)
 
+    #Splunk method to upload to local splunk server
     def push_to_splunk(self, tablewidget):
         for row in range(tablewidget.rowCount()):
             twi0 = tablewidget.item(row,0)
@@ -318,12 +347,43 @@ class ValidationIngestionWindow(QMainWindow):
             print(twi0.text())
         test = SplunkDataSearch()
 
+    #Creates a tree widget
     def create_treelist(self, treewidget, data):
         treewidget.setHeaderHidden(True)
         for x in data:
             list_item = QTreeWidgetItem([x])
             treewidget.addTopLevelItem(list_item)
 
+    #Selection of item on ingestibletree widget
+    def on_ingestitem_selected(self):
+        getSelected = self.ingestibletree.selectedItems()
+        getChildNode = None
+        if getSelected:
+            baseNode = getSelected[0]
+            getChildNode = baseNode.text(0)
+        self.ingestibletree.clearSelection()
+        self.change_logentry_display(getChildNode)
+
+    #Selection of item on noningestibletree widget
+    def on_noningestitem_selected(self):
+        getSelected = self.noningestibletree.selectedItems()
+        getChildNode = None
+        if getSelected:
+            baseNode = getSelected[0]
+            getChildNode = baseNode.text(0)
+        self.noningestibletree.clearSelection()
+        self.change_logentry_display(getChildNode)
+
+    #Change log entry information
+    def change_logentry_display(self, name):
+        self.logentrynamelabel.setText(name)
+
+    #On validate button click call splunk method
     def on_validate_button_clicked(self):
         self.push_to_splunk(self.validatetable)
 
+    #Move on to the next window[Ui_mainwindow_navigation] on ingest button click
+    def on_ingest_button_clicked(self):
+        self.hide()
+        self.window = Ui_mainwindow_navigation()
+        self.window.show()
