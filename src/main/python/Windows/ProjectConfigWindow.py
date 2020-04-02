@@ -187,20 +187,25 @@ class ProjectConfigWindow(QMainWindow):
         self.writedata(3, dir_chosen)
 
     def on_startdate_button_clicked(self):
+        self.start_date_calendar = True
+        self.end_date_calendar = False
         calwindow = CalendarDialog(self)
         calwindow.exec_()
         datechosen =  calwindow.date_picked
-        self.minimumdate = [calwindow.minimumdatelist[0], int(calwindow.minimumdatelist[1]), int(calwindow.minimumdatelist[2])]
+        self.minimumdate = [calwindow.minimumdatelist[0], int(calwindow.minimumdatelist[1]), int(calwindow.minimumdatelist[2])] #[month, day, year]
         self.selectstartdatelabel.setText('Start Date Selected: ' + datechosen)
         print(datechosen)
         """
-        print(type(self.minimumdate[0]))
-        print(type(self.minimumdate[1]))
-        print(type(self.minimumdate[2]))
+        #For debugging purposes
+        print(self.minimumdate[0])
+        print(self.minimumdate[1])
+        print(self.minimumdate[2])
         """
 
     def on_enddate_button_clicked(self):
-        calwindow = CalendarDialog(self, self.minimumdate)
+        self.end_date_calendar = True
+        self.start_date_calendar = False
+        calwindow = CalendarDialog(self)
         calwindow.exec_()
         datechosen =  calwindow.date_picked
         self.selectenddatelabel.setText('Start Date Selected: ' + datechosen)
