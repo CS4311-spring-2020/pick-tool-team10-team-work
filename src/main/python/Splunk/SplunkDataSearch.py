@@ -4,8 +4,8 @@ import json
 
 class SplunkDataSearch():
     def __init__(self):
-        self.user = "cjuare01"
-        self.password = "Ijk342fvn$"
+        self.user = ""
+        self.password = ""
         
         searchQuery = "source=/root/Desktop/splunkuploadtest*"
 
