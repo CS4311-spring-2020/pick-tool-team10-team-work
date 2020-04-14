@@ -208,7 +208,7 @@ class ProjectConfigWindow(QMainWindow):
         calwindow = CalendarDialog(self)
         calwindow.exec_()
         datechosen =  calwindow.date_picked
-        self.selectenddatelabel.setText('Start Date Selected: ' + datechosen)
+        self.selectenddatelabel.setText('End Date Selected: ' + datechosen)
 
     def on_config_button_clicked(self):
         self.hide()
