@@ -74,6 +74,7 @@ class ValidationIngestionWindow(QMainWindow):
         cleanseinfolayout.addStretch()
 
         cleansebutt = QPushButton('Cleanse')
+        cleansebutt.clicked.connect(self.on_cleanse_button_clicked)
 
         cleansebuttlayout.addStretch()
         cleansebuttlayout.addWidget(cleansebutt)
@@ -92,6 +93,7 @@ class ValidationIngestionWindow(QMainWindow):
         cleansecontainerlayout.addStretch()
 
         self.cleansetable = QTableWidget()
+        self.cleansefilelist = []
         cleanseheaderlabels = ['Location/Name', 'Cleansed']
         self.create_table_cleanse(self.cleansetable, cleanseheaderlabels)
 
@@ -111,6 +113,7 @@ class ValidationIngestionWindow(QMainWindow):
         validationinfolayout.addStretch()
 
         validatebutt = QPushButton('Validate')
+        self.searched_list = []
         validatebutt.clicked.connect(self.on_validate_button_clicked)
 
         validationbuttlayout.addStretch()
@@ -149,8 +152,9 @@ class ValidationIngestionWindow(QMainWindow):
         ingestibletitlelayout.addStretch()
 
         self.ingestibletree = QTreeWidget()
-        data = ['Log Entry ####', 'Log Entry ####+1', 'Log Entry ####+2', 'Log Entry ####+3', 'Log Entry ####+4', 'Log Entry ####+5', 'Log Entry ####+6', 'Log Entry ####+7', 'Log Entry ####+8']
-        self.create_treelist(self.ingestibletree, data)
+        self.ingestibletree.setHeaderHidden(True)
+        #data = ['Log Entry ####', 'Log Entry ####+1', 'Log Entry ####+2', 'Log Entry ####+3', 'Log Entry ####+4', 'Log Entry ####+5', 'Log Entry ####+6', 'Log Entry ####+7', 'Log Entry ####+8']
+        #self.create_treelist(self.ingestibletree, data)
         self.ingestibletree.itemSelectionChanged.connect(self.on_ingestitem_selected)
 
         ingestibletreelayout.addStretch()
@@ -167,8 +171,9 @@ class ValidationIngestionWindow(QMainWindow):
         noningestibletitlelayout.addStretch()
 
         self.noningestibletree = QTreeWidget()
-        nondata = ['Log Entry ####+9', 'Log Entry ####+10', 'Log Entry ####+11', 'Log Entry ####+12', 'Log Entry ####+13', 'Log Entry ####+14', 'Log Entry ####+15', 'Log Entry ####+16', 'Log Entry ####+17']
-        self.create_treelist(self.noningestibletree, nondata)
+        self.noningestibletree.setHeaderHidden(True)
+        #nondata = ['Log Entry ####+9', 'Log Entry ####+10', 'Log Entry ####+11', 'Log Entry ####+12', 'Log Entry ####+13', 'Log Entry ####+14', 'Log Entry ####+15', 'Log Entry ####+16', 'Log Entry ####+17']
+        #self.create_treelist(self.noningestibletree, nondata)
         self.noningestibletree.itemSelectionChanged.connect(self.on_noningestitem_selected)
 
         noningestibletreelayout.addStretch()
@@ -214,11 +219,11 @@ class ValidationIngestionWindow(QMainWindow):
         logentrypathlayout.addStretch()
 
         logentrydatalabel = QLabel('Data:    ')
-        logentrydataptedit = QPlainTextEdit('Any data corresponding to this log entry will go here.')
+        self.logentrydataptedit = QPlainTextEdit('Any data corresponding to this log entry will go here.')
 
         logentryboxlayout.addStretch()
         logentryboxlayout.addWidget(logentrydatalabel)
-        logentryboxlayout.addWidget(logentrydataptedit)
+        logentryboxlayout.addWidget(self.logentrydataptedit)
         logentryboxlayout.addStretch()
 
         logentrydelbutt = QPushButton('Delete Log Entry')
@@ -263,41 +268,45 @@ class ValidationIngestionWindow(QMainWindow):
         mainlayout.addLayout(preingestionlayout)
         mainwidget.setLayout(mainlayout)
 
+    #On cleanse button click, start the text cleansing process for all files
+    def on_cleanse_button_clicked(self):
+        data = []
+        #For every file in the list
+        for index1 in range(0, len(self.cleansefilelist)):
+            #Read the file first
+            with open(self.cleansefilelist[index1], 'r') as file:
+                # read a list of lines into data
+                data = file.readlines()
+
+            #For every string in the list
+            for index2 in range(0, len(data)):
+                clean_string = ''
+                #Iterate through the string
+                for character in data[index2]:
+                    #Remove any unnecessary characters not within range from [space] to ~ in ASCII
+                    if (ord(character) >= 32) and (ord(character) <= 126):
+                        clean_string += character
+                data[index2] = clean_string
+
+            #Write the cleaned version back into the file
+            with open(self.cleansefilelist[index1], 'w') as file:
+                file.writelines(data)
+
+            #Change the cleanse table to mark it as cleansed
+            cleanse_item = QTableWidgetItem('yes')
+            cleanse_item.setTextAlignment(Qt.AlignCenter)
+            self.cleansetable.setItem(index1, 1, cleanse_item)
+            #Add the item to validate table
+            validate_status_item = QTableWidgetItem('no')
+            validate_status_item.setTextAlignment(Qt.AlignCenter)
+            validate_name_item = QTableWidgetItem(self.cleansefilelist[index1])
+            validate_name_item.setTextAlignment(Qt.AlignCenter)
+            self.validatetable.setItem(index1, 0, validate_name_item)
+            self.validatetable.setItem(index1, 1, validate_status_item)
+
     #Create a table widget and populating it with cleansed files
     def create_table_cleanse(self, tablewidget, headerlabels):
-        filelist = []
-        basepath = os.path.dirname(__file__)
-        filepath = os.path.abspath(os.path.join(basepath, "../Data/CleansedFiles", ""))
-        
-        #iterate through the files in the cleansed folder
-        for r, d, f in os.walk(filepath):
-            for file in f:
-                filelist.append(os.path.join(r, file))
-
-        tablewidget.setRowCount(len(filelist))
-        tablewidget.setColumnCount(2)
-        tablewidget.setHorizontalHeaderLabels(headerlabels)
-        tablewidget.verticalHeader().setVisible(False)
-        header = tablewidget.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-
-        #Populate table
-        for x in range(tablewidget.rowCount()):
-            for y in range(tablewidget.columnCount()):
-                if y == 0:
-                    path = filelist[x]
-                    item = QTableWidgetItem(path)
-                    item.setTextAlignment(Qt.AlignCenter)
-                    tablewidget.setItem(x,y, item)
-                else:
-                    item = QTableWidgetItem('yes')
-                    item.setTextAlignment(Qt.AlignCenter)
-                    tablewidget.setItem(x,y, item)
-
-    #Create a table widget and populating it with validated files
-    def create_table_validate(self, tablewidget, headerlabels):
         dirlist = []
-        filelist = []
         basepath = os.path.dirname(__file__)
         filepath = os.path.abspath(os.path.join(basepath, "../Data", "ProjectConfigData.txt"))
         
@@ -316,9 +325,9 @@ class ValidationIngestionWindow(QMainWindow):
         for directory in dirlist:
             for r, d, f in os.walk(directory):
                 for file in f:
-                    filelist.append(os.path.join(r, file))
+                    self.cleansefilelist.append(os.path.join(r, file))
 
-        tablewidget.setRowCount(len(filelist))
+        tablewidget.setRowCount(len(self.cleansefilelist))
         tablewidget.setColumnCount(2)
         tablewidget.setHorizontalHeaderLabels(headerlabels)
         tablewidget.verticalHeader().setVisible(False)
@@ -329,30 +338,41 @@ class ValidationIngestionWindow(QMainWindow):
         for x in range(tablewidget.rowCount()):
             for y in range(tablewidget.columnCount()):
                 if y == 0:
-                    path = filelist[x]
+                    path = self.cleansefilelist[x]
                     item = QTableWidgetItem(path)
                     item.setTextAlignment(Qt.AlignCenter)
                     tablewidget.setItem(x,y, item)
                 else:
-                    item = QTableWidgetItem('yes')
+                    item = QTableWidgetItem('no')
                     item.setTextAlignment(Qt.AlignCenter)
                     tablewidget.setItem(x,y, item)
+
+    #Create a table widget and populating it with validated files
+    def create_table_validate(self, tablewidget, headerlabels):
+        tablewidget.setRowCount(len(self.cleansefilelist))
+        tablewidget.setColumnCount(2)
+        tablewidget.setHorizontalHeaderLabels(headerlabels)
+        tablewidget.verticalHeader().setVisible(False)
+        header = tablewidget.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
 
     #Splunk method to upload to local splunk server
     def push_to_splunk(self, tablewidget):
         for row in range(tablewidget.rowCount()):
             twi0 = tablewidget.item(row,0)
             splunkcmd = subprocess.run(["/opt/splunk/bin/splunk", "add", "oneshot", twi0.text()])
-            print("The exit code was: %d" % splunkcmd.returncode)
+            #print("The exit code was: %d" % splunkcmd.returncode)
             print(twi0.text())
         test = SplunkDataSearch()
+        #The list will be inverted
+        self.searched_list = test.item_return
+        self.add_ingestable_entries()
 
-    #Creates a tree widget
-    def create_treelist(self, treewidget, data):
-        treewidget.setHeaderHidden(True)
-        for x in data:
-            list_item = QTreeWidgetItem([x])
-            treewidget.addTopLevelItem(list_item)
+    #Add validated log entries to the ingestable tree list
+    def add_ingestable_entries(self):
+        for list_elem in self.searched_list:
+            list_item = QTreeWidgetItem([list_elem][0])
+            self.ingestibletree.addTopLevelItem(list_item)
 
     #Selection of item on ingestibletree widget
     def on_ingestitem_selected(self):
@@ -377,6 +397,10 @@ class ValidationIngestionWindow(QMainWindow):
     #Change log entry information
     def change_logentry_display(self, name):
         self.logentrynamelabel.setText(name)
+
+        #Retrieving information of that item
+        num = int(name.split()[3]) - 1
+        self.logentrydataptedit.setPlainText(self.searched_list[num][2])
 
     #On validate button click call splunk method
     def on_validate_button_clicked(self):

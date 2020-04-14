@@ -26,7 +26,7 @@ class SplunkDataSearch():
         response = requests.post('https://localhost:8089/services/search/jobs', data=data, verify=False, auth=(self.user, self.password))
         #parse returned xml file string
         root = ET.fromstring(response.text)
-        print(response.text)
+        #print(response.text)
         #extract session ID
         sessionID = root.find('sid').text
         print("Session ID obtained: " + sessionID)
@@ -73,8 +73,12 @@ class SplunkDataSearch():
         #     print(type(key))
         #     print("Key and val are ({}) = ({})".format(key, value))
 
-        results = {}
+        index = 1
+        self.item_return = []
         for entry in jsonObject['results']:
-            print()
-            print("Log Entry: {}".format(entry['_raw']))
-            print("Timestamp: {}".format(entry['_time']))
+            #print()
+            #print("Log Entry: {}".format(entry['_raw']))
+            #print("Timestamp: {}".format(entry['_time']))
+            stringconversion = "Log Entry Number: " + str(index)
+            self.item_return.append([stringconversion, entry['_time'], entry['_raw']])
+            index +=1
