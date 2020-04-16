@@ -153,8 +153,6 @@ class ValidationIngestionWindow(QMainWindow):
 
         self.ingestibletree = QTreeWidget()
         self.ingestibletree.setHeaderHidden(True)
-        #data = ['Log Entry ####', 'Log Entry ####+1', 'Log Entry ####+2', 'Log Entry ####+3', 'Log Entry ####+4', 'Log Entry ####+5', 'Log Entry ####+6', 'Log Entry ####+7', 'Log Entry ####+8']
-        #self.create_treelist(self.ingestibletree, data)
         self.ingestibletree.itemSelectionChanged.connect(self.on_ingestitem_selected)
 
         ingestibletreelayout.addStretch()
@@ -172,8 +170,6 @@ class ValidationIngestionWindow(QMainWindow):
 
         self.noningestibletree = QTreeWidget()
         self.noningestibletree.setHeaderHidden(True)
-        #nondata = ['Log Entry ####+9', 'Log Entry ####+10', 'Log Entry ####+11', 'Log Entry ####+12', 'Log Entry ####+13', 'Log Entry ####+14', 'Log Entry ####+15', 'Log Entry ####+16', 'Log Entry ####+17']
-        #self.create_treelist(self.noningestibletree, nondata)
         self.noningestibletree.itemSelectionChanged.connect(self.on_noningestitem_selected)
 
         noningestibletreelayout.addStretch()
@@ -366,6 +362,11 @@ class ValidationIngestionWindow(QMainWindow):
         test = SplunkDataSearch()
         #The list will be inverted
         self.searched_list = test.item_return
+        #Change the validate table to mark it as validated
+        for index in range(0, len(self.searched_list)):
+            validate_item = QTableWidgetItem('yes')
+            validate_item.setTextAlignment(Qt.AlignCenter)
+            self.validatetable.setItem(index, 1, validate_item)
         self.add_ingestable_entries()
 
     #Add validated log entries to the ingestable tree list
