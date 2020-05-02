@@ -1,1 +1,0 @@
-/root/Desktop/se2fbsenv/venv

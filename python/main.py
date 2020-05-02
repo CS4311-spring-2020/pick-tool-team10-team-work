@@ -2,7 +2,7 @@ from Windows.ProjectConfigWindow import ProjectConfigWindow
 from Windows.mainwindow_vectortableview import Ui_mainwindow_vectortableview
 
 from PyQt5.QtCore import *
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 
 import sys
@@ -59,9 +59,7 @@ class MainApp(QMainWindow):
         self.window.show()
 
 if __name__ == '__main__':
-    appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
-    app = MainApp()
-    app.setGeometry(500, 300, 400, 150)
-    app.show()
-    exit_code = appctxt.app.exec_()      # 2. Invoke appctxt.app.exec_()
-    sys.exit(exit_code)
+    app = QtWidgets.QApplication(sys.argv)
+    ui = MainApp()
+    ui.show()
+    sys.exit(app.exec_())
