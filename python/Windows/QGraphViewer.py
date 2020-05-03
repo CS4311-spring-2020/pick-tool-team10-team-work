@@ -70,9 +70,14 @@ if __name__ == "__main__":
         hilight_Edges=True
     )
 
-    redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\redTeam.png"
-    whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\whiteTeam.png"
-    blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\blueTeam.png"
+    redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/redTeam.png"
+    whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/whiteTeam.png"
+    blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/blueTeam.png"
+
+    #For Windows(change to backslash)
+    #redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\redTeam.png"
+    #whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\whiteTeam.png"
+    #blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\blueTeam.png"
 
     qgv.setStyleSheet("background-color:white;")
     # Create A new Graph using Dot layout engine
