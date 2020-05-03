@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 
+from os import path
 import sys
 
 class MainApp(QMainWindow):
@@ -45,7 +46,29 @@ class MainApp(QMainWindow):
 
         mainwidget.setLayout(mainlayout)
     
+    def cleanse_data(self):
+        basepath = path.dirname(__file__)
+        filepath = path.abspath(path.join(basepath, "./Data", "ProjectConfigData.txt"))
+        filepath2 = path.abspath(path.join(basepath, "./Data", "DateRange.txt"))
+        filepath3 = path.abspath(path.join(basepath, "./Data", "ProjectDescription.txt"))
+
+        #Clean file containing team folder log files
+        file_descriptor = open(filepath, 'w')
+        file_descriptor.write('\n\n\n')
+        file_descriptor.close()
+
+        #Clean file containing the date range for log files
+        file_descriptor2 = open(filepath2, 'w')
+        file_descriptor2.write('\n\n')
+        file_descriptor2.close()
+
+        #Clean file containing the project description
+        file_descriptor3 = open(filepath3, 'w')
+        file_descriptor3.write('\n\n')
+        file_descriptor3.close()
+
     def on_newproj_button_clicked(self):
+        self.cleanse_data()
         self.hide()
         self.window = ProjectConfigWindow()
         self.window.show()

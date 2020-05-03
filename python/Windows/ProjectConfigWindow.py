@@ -18,7 +18,6 @@ class ProjectConfigWindow(QMainWindow):
         mainlayout = QVBoxLayout()
         eventnamelayout = QHBoxLayout()
         eventdesclayout = QHBoxLayout()
-        rootpathlayout = QHBoxLayout()
         path1layout = QHBoxLayout()
         path2layout = QHBoxLayout()
         path3layout = QHBoxLayout()
@@ -43,16 +42,6 @@ class ProjectConfigWindow(QMainWindow):
 
         eventdesclayout.addWidget(eventdesclabel)
         eventdesclayout.addWidget(self.eventdescledit)
-
-        rootpathlabel = QLabel('Root Path:')
-        self.rootpathledit = QLineEdit('Root path goes here.')
-        rootpathbutt = QPushButton()
-        rootpathbutt.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_DirOpenIcon')))
-        rootpathbutt.clicked.connect(self.on_rootdir_button_clicked)
-
-        rootpathlayout.addWidget(rootpathlabel)
-        rootpathlayout.addWidget(self.rootpathledit)
-        rootpathlayout.addWidget(rootpathbutt)
 
         path1label = QLabel('Name of folder inside root path:')
         self.path1ledit = QLineEdit('Directory path of folder 1 goes here.')
@@ -133,7 +122,6 @@ class ProjectConfigWindow(QMainWindow):
 
         mainlayout.addLayout(eventnamelayout)
         mainlayout.addLayout(eventdesclayout)
-        mainlayout.addLayout(rootpathlayout)
         mainlayout.addLayout(path1layout)
         mainlayout.addLayout(path2layout)
         mainlayout.addLayout(path3layout)
@@ -159,33 +147,25 @@ class ProjectConfigWindow(QMainWindow):
         elif location == 2:
             data[2] = dir_chosen + '\n'
             #print("dir2 path: " + data[2])
-        elif location == 3:
-            data[3] = dir_chosen + '\n'
-            #print("dir3 path: " + data[3])
 
         # and write everything back
         with open(filepath, 'w') as file:
             file.writelines( data )
 
-    def on_rootdir_button_clicked(self):
-        dir_chosen = DirDialog().dir_dialog('Choose the root path:')
-        self.rootpathledit.setText(dir_chosen)
+    def on_path1dir_button_clicked(self):
+        dir_chosen = DirDialog().dir_dialog("Choose the path of Red Team's folder")
+        self.path1ledit.setText(dir_chosen)
         self.writedata(0, dir_chosen)
 
-    def on_path1dir_button_clicked(self):
-        dir_chosen = DirDialog().dir_dialog('Choose the path of folder 1')
-        self.path1ledit.setText(dir_chosen)
+    def on_path2dir_button_clicked(self):
+        dir_chosen = DirDialog().dir_dialog("Choose the path of Blue Team's folder")
+        self.path2ledit.setText(dir_chosen)
         self.writedata(1, dir_chosen)
 
-    def on_path2dir_button_clicked(self):
-        dir_chosen = DirDialog().dir_dialog('Choose the path of folder 2')
-        self.path2ledit.setText(dir_chosen)
-        self.writedata(2, dir_chosen)
-
     def on_path3dir_button_clicked(self):
-        dir_chosen = DirDialog().dir_dialog('Choose the path of folder 3')
+        dir_chosen = DirDialog().dir_dialog("Choose the path of White Team's folder")
         self.path3ledit.setText(dir_chosen)
-        self.writedata(3, dir_chosen)
+        self.writedata(2, dir_chosen)
 
     def on_startdate_button_clicked(self):
         self.start_date_calendar = True

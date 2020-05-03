@@ -314,9 +314,6 @@ class ValidationIngestionWindow(QMainWindow):
         with open(filepath, 'r') as file:
             data = file.readlines()
 
-        #remove the root dir for the project
-        del data[0]
-
         #create list for directories
         for directory in data:
             dirlist.append(directory.rstrip())
