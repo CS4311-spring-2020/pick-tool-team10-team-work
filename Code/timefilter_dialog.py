@@ -6,14 +6,14 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-import timefilter_input_interface as tii
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog
-import qstandarditem_datetime as qd
+from qstandarditem_datetime import QStandardItemDateTime
+from timefilter_input_interface import TimefilterInputInterface
 
 
 class TimefilterDialog(QDialog):
-    def __init__(self, datetime_item: qd.QStandardItemDateTime):
+    def __init__(self, datetime_item: QStandardItemDateTime):
         super().__init__()
         self.datetime_item = datetime_item
 
@@ -114,7 +114,7 @@ class TimefilterDialog(QDialog):
 
         self.retranslateUi(self)
         QtCore.QMetaObject.connectSlotsByName(self)
-        tii.TimefilterInputInterface.interface_setup(self)
+        TimefilterInputInterface.interface_setup(self)
 
     def retranslateUi(self, timefilter_dialog):
         _translate = QtCore.QCoreApplication.translate

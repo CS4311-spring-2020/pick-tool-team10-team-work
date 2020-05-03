@@ -1,15 +1,20 @@
+from PyQt5 import QtCore
 from PyQt5.QtCore import QDateTime, QModelIndex
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-import nav_mainwindow as nmw
 from PyQt5.QtWidgets import QMainWindow, QStyleFactory, QAbstractItemView, QCheckBox, QErrorMessage, QMessageBox, \
-    QListView, QDialog, QDateTimeEdit
+    QListView, QDialog, QDateTimeEdit, QTableWidget, QTableWidgetItem, QPushButton, QLineEdit, QComboBox
 
 import timefilter_dialog as td
+from nav_databse_interface import NavDatabaseInterface
+from nav_mainwindow import NavMainWindow
 from qstandarditem_datetime import QStandardItemDateTime
 
 
 class NavInputInterface:
-    nav_mainwindow = nmw.NavMainWindow
+
+    nav_mainwindow: NavMainWindow
+    log_entries_conditions = list()
+    log_entries_regex = ''
 
     @staticmethod
     def interface_setup(nav_mainwindow):
@@ -17,6 +22,7 @@ class NavInputInterface:
         NavInputInterface.checkbox_setup()
         NavInputInterface.button_setup()
         NavInputInterface.listview_setup()
+        NavInputInterface.update_logentries_table(search_type='condition')
 
     @staticmethod
     def checkbox_setup():
@@ -34,13 +40,21 @@ class NavInputInterface:
         NavInputInterface.nav_mainwindow.checkbox_significant_navi.clicked.connect(
             NavInputInterface.checkbox_significant_navi_clicked)
 
-        # team checkboxes
-        NavInputInterface.nav_mainwindow.checkbox_blue_navi.clicked.connect(
-            NavInputInterface.checkbox_blue_navi_clicked)
-        NavInputInterface.nav_mainwindow.checkbox_red_navi.clicked.connect(
-            NavInputInterface.checkbox_red_navi_clicked)
-        NavInputInterface.nav_mainwindow.checkbox_white_navi.clicked.connect(
-            NavInputInterface.checkbox_white_navi_clicked)
+        # creator checkboxes
+        NavInputInterface.nav_mainwindow.checkbox_creator_blue_navi.clicked.connect(
+            NavInputInterface.checkbox_creator_blue_navi_clicked)
+        NavInputInterface.nav_mainwindow.checkbox_creator_red_navi.clicked.connect(
+            NavInputInterface.checkbox_creator_red_navi_clicked)
+        NavInputInterface.nav_mainwindow.checkbox_creator_white_navi.clicked.connect(
+            NavInputInterface.checkbox_creator_white_navi_clicked)
+
+        # event type checkboxes
+        NavInputInterface.nav_mainwindow.checkbox_eventtype_blue_navi.clicked.connect(
+            NavInputInterface.checkbox_creator_blue_navi_clicked)
+        NavInputInterface.nav_mainwindow.checkbox_eventtype_red_navi.clicked.connect(
+            NavInputInterface.checkbox_creator_red_navi_clicked)
+        NavInputInterface.nav_mainwindow.checkbox_eventtype_white_navi.clicked.connect(
+            NavInputInterface.checkbox_creator_white_navi_clicked)
 
     @staticmethod
     def button_setup():
@@ -65,6 +79,11 @@ class NavInputInterface:
         NavInputInterface.nav_mainwindow.button_pull_navi.clicked.connect(
             NavInputInterface.button_pull_navi_clicked)
 
+        #for regex search button
+        NavInputInterface.nav_mainwindow.button_search_navi.setCheckable(True)
+        NavInputInterface.nav_mainwindow.button_search_navi.clicked.connect(
+            NavInputInterface.button_search_navi_clicked)
+
         # for vector and table view button
         NavInputInterface.nav_mainwindow.button_vectortableview_navi.setCheckable(True)
         NavInputInterface.nav_mainwindow.button_vectortableview_navi.clicked.connect(
@@ -72,7 +91,7 @@ class NavInputInterface:
 
     @staticmethod
     def listview_setup():
-        NavInputInterface.nav_mainwindow.listview_location_navi.setEditTriggers(QAbstractItemView.DoubleClicked)
+        #NavInputInterface.nav_mainwindow.listview_location_navi.setEditTriggers(QAbstractItemView.DoubleClicked)
         model = QStandardItemModel()
         model.setItemPrototype(QStandardItem())
         model.itemChanged.connect(NavInputInterface.listview_location_navi_item_change)
@@ -86,7 +105,7 @@ class NavInputInterface:
         model.itemChanged.connect(NavInputInterface.listview_timefilter_navi_item_change)
         NavInputInterface.nav_mainwindow.listview_timefilter_navi.setModel(model)
 
-        NavInputInterface.nav_mainwindow.listview_vectors_navi.setEditTriggers(QAbstractItemView.DoubleClicked)
+        #NavInputInterface.nav_mainwindow.listview_vectors_navi.setEditTriggers(QAbstractItemView.DoubleClicked)
         model = QStandardItemModel()
         model.setItemPrototype(QStandardItem())
         model.itemChanged.connect(NavInputInterface.listview_vectors_navi_item_change)
@@ -108,11 +127,17 @@ class NavInputInterface:
     @staticmethod
     def listview_location_navi_add_items():
         # where will locations be stored?
-        for n in range(10):
-            item = QStandardItem('Location %s' % n)
-            item.setCheckable(True)
-            item.setEditable(True)
-            NavInputInterface.nav_mainwindow.listview_location_navi.model().appendRow(item)
+        listview_location: QListView = NavInputInterface.nav_mainwindow.listview_location_navi
+        listview_location_model: QStandardItemModel = listview_location.model()
+        locations: list = NavDatabaseInterface.find_all_log_entries_return_locations()
+        locations_set = set()
+        for location in locations:
+            if location['location'] not in locations_set:
+                locations_set.add(location['location'])
+                item = QStandardItem(location['location'])
+                item.setCheckable(True)
+                item.setEditable(False)
+                listview_location_model.appendRow(item)
 
     @staticmethod
     def listview_timefilter_navi_add_item(start_datetime: QDateTime, end_datetime: QDateTime):
@@ -126,72 +151,111 @@ class NavInputInterface:
     @staticmethod
     def listview_vectors_navi_add_items():
         # must get vector names from vector db table
-        for n in range(10):
-            item = QStandardItem('Vector %s' % n)
-            item.setCheckable(True)
-            item.setEditable(False)
-            NavInputInterface.nav_mainwindow.listview_vectors_navi.model().appendRow(item)
+        listview_vectors: QListView = NavInputInterface.nav_mainwindow.listview_vectors_navi
+        listview_vectors_model: QStandardItemModel = listview_vectors.model()
+        vectors: list = NavDatabaseInterface.find_all_log_entries_return_vectors()
+        vectors_set = set()
+        for vector in vectors:
+            if vector['vector'] not in vectors_set:
+                vectors_set.add(vector['vector'])
+                item = QStandardItem(vector['vector'])
+                item.setCheckable(True)
+                item.setEditable(False)
+                listview_vectors_model.appendRow(item)
 
     @staticmethod
-    def listview_location_navi_item_change(item):
-        print(item.text() + " " + str(item.checkState()))
+    def listview_location_navi_item_change(item: QStandardItem):
+        print(item.text())
+        location: str = item.text()
+        condition = {'location': location}
+        if item.checkState() == 2:
+            NavInputInterface.log_entries_conditions.append(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+            print('Checked State')
+        elif item.checkState() == 0:
+            NavInputInterface.log_entries_conditions.remove(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+            print('Unchecked State')
 
     @staticmethod
     def listview_timefilter_navi_item_change(item):
         print(item.text() + " " + str(item.checkState()))
 
     @staticmethod
-    def listview_vectors_navi_item_change(item):
-        print(item.text() + " " + str(item.checkState()))
+    def listview_vectors_navi_item_change(item: QStandardItem):
+        print(item.text())
+        vector: str = item.text()
+        condition = {'vector': vector}
+        if item.checkState() == 2:
+            NavInputInterface.log_entries_conditions.append(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+            print('Checked State')
+        elif item.checkState() == 0:
+            NavInputInterface.log_entries_conditions.remove(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+            print('Unchecked State')
 
     @staticmethod
     def checkbox_listnumber_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.checkbox_listnumber_navi.text())
-        checkbox_listnumber_state = NavInputInterface.nav_mainwindow.checkbox_listnumber_navi.isChecked()
+        checkbox_listnumber: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_listnumber_navi
+        print(checkbox_listnumber.text())
+        checkbox_listnumber_state: bool = checkbox_listnumber.isChecked()
         if checkbox_listnumber_state is True:  # checked state
             print('Checked State')
+            NavInputInterface.hide_logentries_column(column=0, hide=True)
         elif checkbox_listnumber_state is False:  # unchecked state
             print('Unchecked State')
+            NavInputInterface.hide_logentries_column(column=0, hide=False)
         else:
             print('Error State')
 
     @staticmethod
     def checkbox_timestamp_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.checkbox_timestamp_navi.text())
-        checkbox_timestamp_state = NavInputInterface.nav_mainwindow.checkbox_timestamp_navi.isChecked()
+        checkbox_timestamp: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_timestamp_navi
+        print(checkbox_timestamp.text())
+        checkbox_timestamp_state: bool = checkbox_timestamp.isChecked()
         if checkbox_timestamp_state is True:  # checked state
             print('Checked State')
+            NavInputInterface.hide_logentries_column(column=1, hide=True)
         elif checkbox_timestamp_state is False:  # unchecked state
-            print('Checked State')
+            print('Unchecked State')
+            NavInputInterface.hide_logentries_column(column=1, hide=False)
         else:
             print('Error State')
 
     @staticmethod
     def checkbox_event_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.checkbox_event_navi.text())
-        checkbox_event_state = NavInputInterface.nav_mainwindow.checkbox_event_navi.isChecked()
+        checkbox_event: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_event_navi
+        print(checkbox_event.text())
+        checkbox_event_state = checkbox_event.isChecked()
         if checkbox_event_state is True:  # checked state
             print('Checked State')
+            NavInputInterface.hide_logentries_column(column=2, hide=True)
         elif checkbox_event_state is False:  # unchecked state
             print('Unchecked State')
+            NavInputInterface.hide_logentries_column(column=2, hide=False)
         else:
             print('Error State')
 
     @staticmethod
     def checkbox_vector_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.checkbox_vector_navi.text())
-        checkbox_vector_state = NavInputInterface.nav_mainwindow.checkbox_vector_navi.isChecked()
+        checkbox_vector: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_vector_navi
+        print(checkbox_vector.text())
+        checkbox_vector_state = checkbox_vector.isChecked()
         if checkbox_vector_state is True:  # checked state
             print('Checked State')
+            NavInputInterface.hide_logentries_column(column=3, hide=True)
         elif checkbox_vector_state is False:  # unchecked state
             print('Unchecked State')
+            NavInputInterface.hide_logentries_column(column=3, hide=False)
         else:
             print('Error State')
 
     @staticmethod
     def checkbox_significant_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.checkbox_significant_navi.text())
-        checkbox_significant_state = NavInputInterface.nav_mainwindow.checkbox_significant_navi.isChecked()
+        checkbox_significant: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_significant_navi
+        print(checkbox_significant.text())
+        checkbox_significant_state = checkbox_significant.isChecked()
         if checkbox_significant_state is True:  # checked state
             print('Checked State')
         elif checkbox_significant_state is False:  # unchecked state
@@ -200,78 +264,136 @@ class NavInputInterface:
             print('Error State')
 
     @staticmethod
-    def checkbox_blue_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.checkbox_blue_navi.text())
-        checkbox_blue_state = NavInputInterface.nav_mainwindow.checkbox_blue_navi.isChecked()
+    def checkbox_creator_blue_navi_clicked():
+        checkbox_blue: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_blue_navi
+        checkbox_blue_state: bool = checkbox_blue.isChecked()
+        condition = {'team': 'blue'}
         if checkbox_blue_state is True:  # checked state
-            print('Checked State')
+            NavInputInterface.log_entries_conditions.append(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
         elif checkbox_blue_state is False:  # unchecked state
-            print('Unchecked State')
+            NavInputInterface.log_entries_conditions.remove(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
         else:
             print('Error State')
 
     @staticmethod
-    def checkbox_red_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.checkbox_red_navi.text())
-        checkbox_red_state = NavInputInterface.nav_mainwindow.checkbox_red_navi.isChecked()
+    def checkbox_creator_red_navi_clicked():
+        checkbox_red: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_red_navi
+        checkbox_red_state: bool = checkbox_red.isChecked()
+        condition = {'team': 'red'}
         if checkbox_red_state is True:  # checked state
-            print('Checked State')
+            NavInputInterface.log_entries_conditions.append(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
         elif checkbox_red_state is False:  # unchecked state
-            print('Unchecked State')
+            NavInputInterface.log_entries_conditions.remove(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
         else:
             print('Error State')
 
     @staticmethod
-    def checkbox_white_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.checkbox_white_navi.text())
-        checkbox_white_state = NavInputInterface.nav_mainwindow.checkbox_white_navi.isChecked()
+    def checkbox_creator_white_navi_clicked():
+        checkbox_white: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_white_navi
+        checkbox_white_state: bool = checkbox_white.isChecked()
+        condition = {'team': 'white'}
         if checkbox_white_state is True:  # checked state
-            print('Checked State')
+            NavInputInterface.log_entries_conditions.append(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
         elif checkbox_white_state is False:  # unchecked state
-            print('Unchecked State')
+            NavInputInterface.log_entries_conditions.remove(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+        else:
+            print('Error State')
+
+    @staticmethod
+    def checkbox_eventtype_blue_navi_clicked():
+        checkbox_blue: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_blue_navi
+        checkbox_blue_state: bool = checkbox_blue.isChecked()
+        condition = {'team': 'blue'}
+        if checkbox_blue_state is True:  # checked state
+            NavInputInterface.log_entries_conditions.append(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+        elif checkbox_blue_state is False:  # unchecked state
+            NavInputInterface.log_entries_conditions.remove(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+        else:
+            print('Error State')
+
+    @staticmethod
+    def checkbox_eventtype_red_navi_clicked():
+        checkbox_red: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_red_navi
+        checkbox_red_state: bool = checkbox_red.isChecked()
+        condition = {'team': 'red'}
+        if checkbox_red_state is True:  # checked state
+            NavInputInterface.log_entries_conditions.append(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+        elif checkbox_red_state is False:  # unchecked state
+            NavInputInterface.log_entries_conditions.remove(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+        else:
+            print('Error State')
+
+    @staticmethod
+    def checkbox_eventtype_white_navi_clicked():
+        checkbox_white: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_white_navi
+        checkbox_white_state: bool = checkbox_white.isChecked()
+        condition = {'team': 'white'}
+        if checkbox_white_state is True:  # checked state
+            NavInputInterface.log_entries_conditions.append(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
+        elif checkbox_white_state is False:  # unchecked state
+            NavInputInterface.log_entries_conditions.remove(condition)
+            NavInputInterface.update_logentries_table(search_type='condition')
         else:
             print('Error State')
 
     @staticmethod
     def button_undo_navi_clicked():
-        # TODO Call & Create undo functionality method(s0
-        #   Complete Req = optional
-        #   Author = Aaron
-        print(NavInputInterface.nav_mainwindow.button_undo_navi.text())
-        NavInputInterface.nav_mainwindow.button_undo_navi.toggle()
+        # TODO Call & Create undo functionality method(s)
+        button_undo: QPushButton = NavInputInterface.nav_mainwindow.button_undo_navi
+        print(button_undo.text() + ' clicked')
+        button_undo.toggle()
 
     @staticmethod
     def button_redo_navi_clicked():
         # TODO Call & Create redo functionality method(s)
-        #   Complete Req = optional
-        #   Author = Aaron
-        print(NavInputInterface.nav_mainwindow.button_redo_navi.text())
-        NavInputInterface.nav_mainwindow.button_redo_navi.toggle()
+        button_redo: QPushButton = NavInputInterface.nav_mainwindow.button_redo_navi
+        print(button_redo.text() + ' clicked')
+        button_redo.toggle()
 
     @staticmethod
     def button_push_navi_clicked():
         # TODO Call & Create push functionality method(s)
-        #   Complete Req = unknown (probably required)
-        #   Author = Angelica
-        print(NavInputInterface.nav_mainwindow.button_push_navi.text())
-        NavInputInterface.nav_mainwindow.button_push_navi.toggle()
+        button_push: QPushButton = NavInputInterface.nav_mainwindow.button_push_navi
+        print(button_push.text() + ' clicked')
+        button_push.toggle()
 
     @staticmethod
     def button_pull_navi_clicked():
         # TODO Call & Create pull functionality method(s)
-        #   Complete Req = unknown (probably required)
-        #   Author = Anglelica
-        print(NavInputInterface.nav_mainwindow.button_pull_navi.text())
-        NavInputInterface.nav_mainwindow.button_pull_navi.toggle()
+        button_pull: QPushButton = NavInputInterface.nav_mainwindow.button_pull_navi
+        print(button_pull.text() + ' clicked')
+        button_pull.toggle()
+
+    @staticmethod
+    def button_search_navi_clicked():
+        button_search: QPushButton = NavInputInterface.nav_mainwindow.button_search_navi
+        print(button_search.text() + ' clicked')
+        regex_search_lineedit: QLineEdit = NavInputInterface.nav_mainwindow.linedit_regex_navi
+        NavInputInterface.log_entries_regex = regex_search_lineedit.text()
+        print('regex text: ' + NavInputInterface.log_entries_regex)
+        button_search.toggle()
+        NavInputInterface.update_logentries_table(search_type='regex')
 
     @staticmethod
     def button_timefilter_navi_clicked():
-        print(NavInputInterface.nav_mainwindow.button_timefilter_navi.text())
-        NavInputInterface.nav_mainwindow.button_timefilter_navi.toggle()
-        start_datetime = NavInputInterface.nav_mainwindow.datetimeedit_starttime_navi.dateTime()
-        end_datetime = NavInputInterface.nav_mainwindow.datetimeedit_endtime_navi.dateTime()
-        start_datetime_info = start_datetime.toString('yyyyMMddhhmmss')
-        end_datetime_info = end_datetime.toString('yyyyMMddhhmmss')
+        button_timefilter: QPushButton = NavInputInterface.nav_mainwindow.button_timefilter_navi
+        print(button_timefilter.text() + ' clicked')
+        button_timefilter.toggle()
+        start_datetime: QDateTime = NavInputInterface.nav_mainwindow.datetimeedit_starttime_navi.dateTime()
+        end_datetime: QDateTime = NavInputInterface.nav_mainwindow.datetimeedit_endtime_navi.dateTime()
+        start_datetime_info: str = start_datetime.toString('yyyyMMddhhmmss')
+        end_datetime_info: str = end_datetime.toString('yyyyMMddhhmmss')
         if NavInputInterface.check_datetimes_values(int(start_datetime_info), int(end_datetime_info)) is False:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
@@ -287,12 +409,69 @@ class NavInputInterface:
         # TODO Open up the vectortableview
         #   Complete Req = required
         #   Author = Aaron and Andy
-        print(NavInputInterface.nav_mainwindow.button_vectortableview_navi.text())
-        NavInputInterface.nav_mainwindow.button_vectortableview_navi.toggle()
+        button_vectortableview: QPushButton = NavInputInterface.nav_mainwindow.button_vectortableview_navi
+        print(button_vectortableview.text() + ' clicked')
+        button_vectortableview.toggle()
 
     @staticmethod
     def check_datetimes_values(start_datetime_info: int, end_datetime_info: int) -> bool:
         return (start_datetime_info - end_datetime_info) < 0
+
+    @staticmethod
+    def uncheck_all_checkboxes():
+        checkbox_white: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_white_navi
+        checkbox_red: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_red_navi
+        checkbox_blue: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_blue_navi
+        checkbox_white.setCheckState(False)
+        checkbox_red.setCheckState(False)
+        checkbox_blue.setCheckState(False)
+
+        listview_vectors: QListView = NavInputInterface.nav_mainwindow.listview_vectors_navi
+        listview_vectors_model: QStandardItemModel = listview_vectors.model()
+
+        listview_location: QListView = NavInputInterface.nav_mainwindow.listview_location_navi
+        listview_location_model: QStandardItemModel = listview_location.model()
+
+    @staticmethod
+    def update_logentries_table(search_type: str = None):
+        table_widget: QTableWidget = NavInputInterface.nav_mainwindow.tablewidget_navi
+        table_widget.setSortingEnabled(False)
+        if search_type == 'condition':
+            log_entries: list = NavDatabaseInterface.find_log_entries_condition(NavInputInterface.log_entries_conditions)
+        elif search_type == 'regex':
+            log_entries: list = NavDatabaseInterface.find_log_entries_regex(NavInputInterface.log_entries_regex)
+        table_widget.clearContents()
+
+        temp_item = QComboBox()
+        temp_item.addItem('hi')
+        temp_item.addItem('dero')
+
+        counter: int = 0
+        for log_entry in log_entries:
+            table_widget.insertRow(counter)
+            list_number_item = QTableWidgetItem(str(log_entry['list_number']))
+            list_number_item.setFlags(QtCore.Qt.ItemIsEnabled)
+            #list_number_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+            #list_number_item.setCheckState(QtCore.Qt.Unchecked)
+            timestamp_item = QTableWidgetItem(log_entry['timestamp'])
+            timestamp_item.setFlags(QtCore.Qt.ItemIsEnabled)
+            vector_item = QTableWidgetItem(log_entry['vector'])
+            vector_item.setFlags(QtCore.Qt.ItemIsEnabled)
+
+            table_widget.setItem(counter, 0, list_number_item)
+            table_widget.setItem(counter, 1, timestamp_item)  # log entry timestamp column
+            table_widget.setItem(counter, 2, QTableWidgetItem(log_entry['event']))  # log entry event column
+            #table_widget.setItem(counter, 3, vector_item)  # vector column
+            table_widget.setCellWidget(counter, 3, temp_item)
+            counter += 1
+
+        table_widget.setRowCount(len(log_entries))
+        table_widget.setSortingEnabled(True)
+
+    @staticmethod
+    def hide_logentries_column(column: int, hide: bool):
+        table_widget: QTableWidget = NavInputInterface.nav_mainwindow.tablewidget_navi
+        table_widget.setColumnHidden(column, hide)
 
 
 """

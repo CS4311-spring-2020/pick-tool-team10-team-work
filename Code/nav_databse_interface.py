@@ -1,173 +1,118 @@
-import sqlite3
-from sqlite3 import Error
+
 import pathlib as pl
+import pymongo
+from pymongo import MongoClient, collection, cursor, database, errors
+from pymongo.results import InsertOneResult, DeleteResult, InsertManyResult
 
 
 class NavDatabaseInterface:
-
     db_parent_filepath = str(pl.Path(__file__).parent.absolute()) + '/database_files/'
     db_filepath = str(pl.Path(__file__).parent.absolute()) + '/database_files/database.db'
+    client = MongoClient('mongodb://localhost:27017/')
 
     @staticmethod
-    def create_db_conn():
-        """
+    def create_log_entries_item(list_number: int, timestamp: str, event: str,
+                                vector: str, location: str, creator: str) -> dict:
+        logentry_item: dict = {
+            'list_number': list_number,
+            'timestamp': timestamp,
+            'event': event,
+            'vector': vector,
+            'location': location,
+            'creator': creator
+        }
+        return logentry_item
 
-        :return:
-        """
-        conn = None
+    @staticmethod
+    def insert_one_log_entries(log_entry_item: dict) -> None:
         try:
-            conn = sqlite3.connect(NavDatabaseInterface.db_filepath)
-            return conn
-        except Error as e:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            log_entries: collection = db.get_collection('log_entries')
+            result: InsertOneResult = log_entries.insert_one(log_entry_item)
+        except pymongo.errors.OperationFailure as e:
             print(e)
-        return conn
 
     @staticmethod
-    def create_logentry_col() -> bool:
-        """
-
-        :return:
-        """
-        conn = NavDatabaseInterface.create_db_conn()
-        if conn is None:
-            return False
-
-        create_logentry_table_string = '''
-        CREATE TABLE IF NOT EXISTS logentry_table (
-        list_number INTEGER,
-        timestamp TEXT,
-        event TEXT,
-        vector TEXT)
-        '''
+    def insert_many_log_entries(log_entries_items: list) -> None:
         try:
-            cur = conn.cursor()
-            cur.execute(create_logentry_table_string)
-            cur.close()
-            conn.commit()
-            conn.close()
-            return True
-        except Error as e:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            log_entries: collection = db.get_collection('log_entries')
+            result: InsertManyResult = log_entries.insert_many(log_entries_items)
+        except pymongo.errors.OperationFailure as e:
             print(e)
-        return False
 
     @staticmethod
-    def create_timefilter_table() -> bool:
-        """
-
-        :return:
-        """
-        conn = NavDatabaseInterface.create_db_conn()
-        if conn is None:
-            return False
-
-        create_timefilter_table_string = '''
-        CREATE TABLE IF NOT EXISTS timefilter_table (
-        name TEXT,
-        start_time TEXT,
-        end_time TEXT,
-        uid TEXT)
-        '''
+    def find_all_log_entries() -> list:
         try:
-            cur = conn.cursor()
-            cur.execute(create_timefilter_table_string)
-            cur.close()
-            conn.commit()
-            conn.close()
-            return True
-        except Error as e:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            log_entries: collection = db.get_collection('log_entries')
+            query_result: cursor = log_entries.find()
+            return list(query_result)
+        except pymongo.errors.OperationFailure as e:
             print(e)
-        return False
 
     @staticmethod
-    def insert_timefilter_item(uid: str, name: str, start_time: str, end_time: str) -> bool:
-        """
-
-        :param uid:
-        :param name:
-        :param start_time:
-        :param end_time:
-        :return:
-        """
-        conn = NavDatabaseInterface.create_db_conn()
-        if conn is None:
-            return False
-
-        insert_timefilter_data = (name, start_time, end_time, uid)
-        insert_timefilter_query = '''
-        INSERT INTO timefilter_table 
-        (name, start_time, end_time, uid)
-        VALUES 
-        (?, ?, ?, ?)
-        '''
-
+    def find_log_entries_condition(conditions: list) -> list:
         try:
-            cur = conn.cursor()
-            cur.execute(insert_timefilter_query, insert_timefilter_data)
-            cur.close()
-            conn.commit()
-            conn.close()
-            return True
-        except Error as e:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            log_entries: collection = db.get_collection('log_entries')
+            query = {}
+            if conditions is not None and len(conditions) != 0:
+                query = {'$or': conditions}
+            query_result: cursor = log_entries.find(query)
+            return list(query_result)
+        except pymongo.errors.OperationFailure as e:
             print(e)
-        return False
-
 
     @staticmethod
-    def update_timefilter_item(uid: str, name: str = None, start_time: str = None, end_time: str = None) -> bool:
-        """
-
-        :param uid:
-        :param name:
-        :param start_time:
-        :param end_time:
-        :return:
-        """
-        conn = NavDatabaseInterface.create_db_conn()
-        if conn is None:
-            return False
-
-        update_timefilter_data = []
-        update_timefilter_query = '''UPDATE timefilter_table SET'''
-
-        if name is not None:
-            update_timefilter_query += ''' name = ?,'''
-            update_timefilter_data.append(name)
-        if start_time is not None:
-            update_timefilter_query += ''' start_time = ?,'''
-            update_timefilter_data.append(start_time)
-        if end_time is not None:
-            update_timefilter_query += ''' end_time = ?,'''
-            update_timefilter_data.append(end_time)
-
-        update_timefilter_query = update_timefilter_query[:-1]
-        update_timefilter_query += ''' WHERE uid = ?'''
-        update_timefilter_data.append(uid)
-        update_timefilter_data = tuple(update_timefilter_data)
-
+    def find_log_entries_regex(regex_search: str) -> list:
         try:
-            cur = conn.cursor()
-            cur.execute(update_timefilter_query, update_timefilter_data)
-            cur.close()
-            conn.commit()
-            conn.close()
-            return True
-        except Error as e:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            log_entries: collection = db.get_collection('log_entries')
+            query = {}
+            if regex_search is not None and len(regex_search) != 0:
+                query = {'event': {'$regex': regex_search}}
+            query_result: cursor = log_entries.find(query)
+            return list(query_result)
+        except pymongo.errors.OperationFailure as e:
             print(e)
-        return False
 
     @staticmethod
-    def select_timefilter_one_item(uid: str) -> tuple:
-        conn = NavDatabaseInterface.create_db_conn()
-        if conn is None:
-            return False
-
-        print("awef")
+    def find_all_log_entries_return_vectors() -> list:
+        try:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            log_entries: collection = db.get_collection('log_entries')
+            query_result: cursor = log_entries.find({}, {'vector': 1})
+            return list(query_result)
+        except pymongo.errors.OperationFailure as e:
+            print(e)
 
     @staticmethod
-    def select_timefilter_all_items() -> list:
-        conn = NavDatabaseInterface.create_db_conn()
-        if conn is None:
-            return False
+    def find_all_log_entries_return_locations() -> list:
+        try:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            log_entries: collection = db.get_collection('log_entries')
+            query_result: cursor = log_entries.find({}, {'location': 1})
+            return list(query_result)
+        except pymongo.errors.OperationFailure as e:
+            print(e)
 
-        print("awerf")
+    @staticmethod
+    def delete_all_items_log_entries() -> None:
+        try:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            log_entries: collection = db.get_collection('log_entries')
+            x: DeleteResult = log_entries.delete_many({})
+            print(x.deleted_count, " documents deleted.")
+        except pymongo.errors.OperationFailure as e:
+            print(e)
 
+    @staticmethod
+    def delete_log_entries_collection() -> None:
+        try:
+            db: database = NavDatabaseInterface.client.get_database('pick_database')
+            print(db.list_collection_names)
+            db.drop_collection('log_entries')
+            print(db.list_collection_names())
+        except pymongo.errors.OperationFailure as e:
+            print(e)

@@ -24,6 +24,8 @@ class NavMainWindow(QMainWindow):
         self.vl_allwindow_navi = QtWidgets.QVBoxLayout()
         self.vl_allwindow_navi.setSpacing(0)
         self.vl_allwindow_navi.setObjectName("vl_allwindow_navi")
+
+        # region top row
         self.hl_top_navi = QtWidgets.QHBoxLayout()
         self.hl_top_navi.setObjectName("hl_top_navi")
 
@@ -64,10 +66,12 @@ class NavMainWindow(QMainWindow):
         self.label_navigation_navi.setObjectName("label_navigation_navi")
         self.hl_top_navi.addWidget(self.label_navigation_navi)
         self.vl_allwindow_navi.addLayout(self.hl_top_navi)
+        #endregion
 
         spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.vl_allwindow_navi.addItem(spacerItem1)
 
+        # region second row widgets
         self.hl_vcandsearch_navi = QtWidgets.QHBoxLayout()
         self.hl_vcandsearch_navi.setObjectName("hl_vcandsearch_navi")
 
@@ -99,7 +103,19 @@ class NavMainWindow(QMainWindow):
 
         self.linedit_regex_navi = QtWidgets.QLineEdit(self.centralwidget_allwindow_nav)
         self.linedit_regex_navi.setObjectName("linedit_regex_navi")
+        self.linedit_regex_navi.setPlaceholderText('Keyword Search')
         self.hl_vcandsearch_navi.addWidget(self.linedit_regex_navi)
+
+        self.button_search_navi = QtWidgets.QPushButton(self.centralwidget_allwindow_nav)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.button_search_navi.sizePolicy().hasHeightForWidth())
+        self.button_search_navi.setSizePolicy(sizePolicy)
+        self.button_search_navi.setAutoDefault(False)
+        self.button_search_navi.setObjectName("button_search_navi")
+        self.button_search_navi.setText('Regex Search')
+        self.hl_vcandsearch_navi.addWidget(self.button_search_navi)
 
         spacerItem4 = QtWidgets.QSpacerItem(15, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.hl_vcandsearch_navi.addItem(spacerItem4)
@@ -108,6 +124,7 @@ class NavMainWindow(QMainWindow):
         self.button_vectortableview_navi.setObjectName("button_vectortableview_navi")
         self.hl_vcandsearch_navi.addWidget(self.button_vectortableview_navi)
         self.vl_allwindow_navi.addLayout(self.hl_vcandsearch_navi)
+        #endregion
 
         spacerItem5 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.vl_allwindow_navi.addItem(spacerItem5)
@@ -115,6 +132,7 @@ class NavMainWindow(QMainWindow):
         self.hl_bottom_navi = QtWidgets.QHBoxLayout()
         self.hl_bottom_navi.setObjectName("hl_bottom_navi")
 
+        #region scroll area
         self.scrollarea01_hl_bottom_navi = QtWidgets.QScrollArea(self.centralwidget_allwindow_nav)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(2)
@@ -130,10 +148,39 @@ class NavMainWindow(QMainWindow):
         self.scrollareacontentwidgets_hl_bottom_navi.setObjectName("scrollareacontentwidgets_hl_bottom_navi")
         self.gridLayout_8 = QtWidgets.QGridLayout(self.scrollareacontentwidgets_hl_bottom_navi)
         self.gridLayout_8.setObjectName("gridLayout_8")
+        #endregion
 
         self.vl_allfilters_navi = QtWidgets.QVBoxLayout()
         self.vl_allfilters_navi.setObjectName("vl_allfilters_navi")
 
+        # region filter configuration header
+        self.vl_filterconfiguration_navi = QtWidgets.QVBoxLayout()
+        self.vl_filterconfiguration_navi.setObjectName("vl_filterconfiguration_navi")
+
+        self.label_filterconfiguration_navi = QtWidgets.QLabel(self.scrollareacontentwidgets_hl_bottom_navi)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_filterconfiguration_navi.sizePolicy().hasHeightForWidth())
+        self.label_filterconfiguration_navi.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_filterconfiguration_navi.setFont(font)
+        self.label_filterconfiguration_navi.setObjectName("label_filterconfiguration_navi")
+        self.vl_filterconfiguration_navi.addWidget(self.label_filterconfiguration_navi)
+
+        self.vl_allfilters_navi.addLayout(self.vl_filterconfiguration_navi)
+
+        self.line07_hl_bottom_navi = QtWidgets.QFrame(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.line07_hl_bottom_navi.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line07_hl_bottom_navi.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line07_hl_bottom_navi.setObjectName("line07_hl_bottom_navi")
+        self.vl_allfilters_navi.addWidget(self.line07_hl_bottom_navi)
+        #endregion
+
+        # region location filter
         self.vl_locationfilter_navi = QtWidgets.QVBoxLayout()
         self.vl_locationfilter_navi.setObjectName("vl_locationfilter_navi")
 
@@ -169,7 +216,9 @@ class NavMainWindow(QMainWindow):
         self.line05_hl_bottom_navi.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line05_hl_bottom_navi.setObjectName("line05_hl_bottom_navi")
         self.vl_allfilters_navi.addWidget(self.line05_hl_bottom_navi)
+        #endregion
 
+        #region show hide filter
         self.vl_showhidefilter_navi = QtWidgets.QVBoxLayout()
         self.vl_showhidefilter_navi.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.vl_showhidefilter_navi.setSpacing(6)
@@ -217,7 +266,9 @@ class NavMainWindow(QMainWindow):
         self.line01_hl_bottom_navi.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line01_hl_bottom_navi.setObjectName("line01_hl_bottom_navi")
         self.vl_allfilters_navi.addWidget(self.line01_hl_bottom_navi)
+        #endregion
 
+        #region time filter
         self.vl_timefilter_navi = QtWidgets.QVBoxLayout()
         self.vl_timefilter_navi.setObjectName("vl_timefilter_navi")
 
@@ -296,7 +347,9 @@ class NavMainWindow(QMainWindow):
         self.line02_hl_bottom_navi.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line02_hl_bottom_navi.setObjectName("line02_hl_bottom_navi")
         self.vl_allfilters_navi.addWidget(self.line02_hl_bottom_navi)
+        #endregion
 
+        # region significant filter
         self.vl_significantfilter_navi = QtWidgets.QVBoxLayout()
         self.vl_significantfilter_navi.setObjectName("vl_significantfilter_navi")
 
@@ -311,44 +364,87 @@ class NavMainWindow(QMainWindow):
         self.line03_hl_bottom_navi.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line03_hl_bottom_navi.setObjectName("line03_hl_bottom_navi")
         self.vl_allfilters_navi.addWidget(self.line03_hl_bottom_navi)
+        #endregion
 
-        self.vl_teamfilter_navi = QtWidgets.QVBoxLayout()
-        self.vl_teamfilter_navi.setObjectName("vl_teamfilter_navi")
+        # region creator filter
+        self.vl_creatorfilter_navi = QtWidgets.QVBoxLayout()
+        self.vl_creatorfilter_navi.setObjectName("vl_creatorfilter_navi")
 
-        self.label_team_navi = QtWidgets.QLabel(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.label_creator_navi = QtWidgets.QLabel(self.scrollareacontentwidgets_hl_bottom_navi)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_team_navi.sizePolicy().hasHeightForWidth())
-        self.label_team_navi.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.label_creator_navi.sizePolicy().hasHeightForWidth())
+        self.label_creator_navi.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.label_team_navi.setFont(font)
-        self.label_team_navi.setObjectName("label_team_navi")
-        self.vl_teamfilter_navi.addWidget(self.label_team_navi)
+        self.label_creator_navi.setFont(font)
+        self.label_creator_navi.setObjectName("label_team_navi")
+        self.vl_creatorfilter_navi.addWidget(self.label_creator_navi)
 
-        self.checkbox_red_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
-        self.checkbox_red_navi.setObjectName("checkbox_red_navi")
-        self.vl_teamfilter_navi.addWidget(self.checkbox_red_navi)
+        self.checkbox_creator_red_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.checkbox_creator_red_navi.setObjectName("checkbox_creator_red_navi")
+        self.vl_creatorfilter_navi.addWidget(self.checkbox_creator_red_navi)
 
-        self.checkbox_blue_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
-        self.checkbox_blue_navi.setObjectName("checkbox_blue_navi")
-        self.vl_teamfilter_navi.addWidget(self.checkbox_blue_navi)
+        self.checkbox_creator_blue_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.checkbox_creator_blue_navi.setObjectName("checkbox_creator_blue_navi")
+        self.vl_creatorfilter_navi.addWidget(self.checkbox_creator_blue_navi)
 
-        self.checkbox_white_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
-        self.checkbox_white_navi.setObjectName("checkbox_white_navi")
-        self.vl_teamfilter_navi.addWidget(self.checkbox_white_navi)
+        self.checkbox_creator_white_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.checkbox_creator_white_navi.setObjectName("checkbox_creator_white_navi")
+        self.vl_creatorfilter_navi.addWidget(self.checkbox_creator_white_navi)
 
-        self.vl_allfilters_navi.addLayout(self.vl_teamfilter_navi)
+        self.vl_allfilters_navi.addLayout(self.vl_creatorfilter_navi)
 
         self.line04_hl_bottom_navi = QtWidgets.QFrame(self.scrollareacontentwidgets_hl_bottom_navi)
         self.line04_hl_bottom_navi.setFrameShape(QtWidgets.QFrame.HLine)
         self.line04_hl_bottom_navi.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line04_hl_bottom_navi.setObjectName("line04_hl_bottom_navi")
         self.vl_allfilters_navi.addWidget(self.line04_hl_bottom_navi)
+        # endregion
 
+        # region event type filter
+        self.vl_eventtypefilter_navi = QtWidgets.QVBoxLayout()
+        self.vl_eventtypefilter_navi.setObjectName("vl_eventtypefilter_navi")
+
+        self.label_eventtype_navi = QtWidgets.QLabel(self.scrollareacontentwidgets_hl_bottom_navi)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_eventtype_navi.sizePolicy().hasHeightForWidth())
+        self.label_eventtype_navi.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_eventtype_navi.setFont(font)
+        self.label_eventtype_navi.setObjectName("label_eventtype_navi")
+        self.vl_eventtypefilter_navi.addWidget(self.label_eventtype_navi)
+
+        self.checkbox_eventtype_red_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.checkbox_eventtype_red_navi.setObjectName("checkbox_eventtype_red_navi")
+        self.vl_eventtypefilter_navi.addWidget(self.checkbox_eventtype_red_navi)
+
+        self.checkbox_eventtype_blue_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.checkbox_eventtype_blue_navi.setObjectName("checkbox_eventtype_blue_navi")
+        self.vl_eventtypefilter_navi.addWidget(self.checkbox_eventtype_blue_navi)
+
+        self.checkbox_eventtype_white_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.checkbox_eventtype_white_navi.setObjectName("checkbox_eventtype_white_navi")
+        self.vl_eventtypefilter_navi.addWidget(self.checkbox_eventtype_white_navi)
+
+        self.vl_allfilters_navi.addLayout(self.vl_eventtypefilter_navi)
+
+        self.line06_hl_bottom_navi = QtWidgets.QFrame(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.line06_hl_bottom_navi.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line06_hl_bottom_navi.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line06_hl_bottom_navi.setObjectName("line06_hl_bottom_navi")
+        self.vl_allfilters_navi.addWidget(self.line06_hl_bottom_navi)
+        # endregion
+
+        # region vector filter
         self.vl_vectorsfilter_navi = QtWidgets.QVBoxLayout()
         self.vl_vectorsfilter_navi.setObjectName("vl_vectorsfilter_navi")
 
@@ -378,6 +474,8 @@ class NavMainWindow(QMainWindow):
         self.vl_vectorsfilter_navi.addWidget(self.listview_vectors_navi)
 
         self.vl_allfilters_navi.addLayout(self.vl_vectorsfilter_navi)
+        # endregion
+
         self.gridLayout_8.addLayout(self.vl_allfilters_navi, 0, 0, 1, 1)
 
         self.scrollarea01_hl_bottom_navi.setWidget(self.scrollareacontentwidgets_hl_bottom_navi)
@@ -386,6 +484,7 @@ class NavMainWindow(QMainWindow):
         spacerItem6 = QtWidgets.QSpacerItem(5, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.hl_bottom_navi.addItem(spacerItem6)
 
+        # region log entry table widget
         self.tablewidget_navi = QtWidgets.QTableWidget(self.centralwidget_allwindow_nav)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(8)
@@ -395,39 +494,6 @@ class NavMainWindow(QMainWindow):
         self.tablewidget_navi.setObjectName("tablewidget_navi")
         self.tablewidget_navi.setColumnCount(4)
 
-        self.tablewidget_navi.setRowCount(16)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(3, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(4, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(5, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(6, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(7, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(8, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(9, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(10, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(11, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(12, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(13, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(14, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tablewidget_navi.setVerticalHeaderItem(15, item)
         item = QtWidgets.QTableWidgetItem()
         self.tablewidget_navi.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -447,12 +513,14 @@ class NavMainWindow(QMainWindow):
         self.tablewidget_navi.verticalHeader().setSortIndicatorShown(True)
         self.tablewidget_navi.verticalHeader().setStretchLastSection(True)
         self.hl_bottom_navi.addWidget(self.tablewidget_navi)
+        #endregion
 
         self.vl_allwindow_navi.addLayout(self.hl_bottom_navi)
         self.gridLayout.addLayout(self.vl_allwindow_navi, 0, 0, 1, 1)
 
         self.setCentralWidget(self.centralwidget_allwindow_nav)
 
+        # region menu and status bar
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 787, 22))
         self.menubar.setObjectName("menubar")
@@ -460,35 +528,12 @@ class NavMainWindow(QMainWindow):
         self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
+        #endregion
 
         self.retranslateUi(self)
         QtCore.QMetaObject.connectSlotsByName(self)
-        #self.checkbox_setup()
-        #self.button_setup()
-        '''
-        self.listview_location_navi.setEditTriggers(QAbstractItemView.DoubleClicked)
-        self.listview_location_navi.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.listview_location_navi.customContextMenuRequested.connect(self.contextMenuEventM)
-        self.model = QStandardItemModel()
-        #self.model.itemChanged.connect(nii.set_items)
-        for n in range(10):
-            item = QStandardItem('Item %s' % n)
-            item.setCheckable(True)
-            item.setEditable(True)
-            self.model.appendRow(item)
-        self.listview_location_navi.setModel(self.model)
-        '''
-        self.setup_interace()
 
-    def contextMenuEventM(self, position):
-        print(position)
-        contextMenu = QMenu(self)
-        newAct = contextMenu.addAction("New")
-        openAct = contextMenu.addAction("Open")
-        quitAct = contextMenu.addAction("Quit")
-        action = contextMenu.exec_(self.mapToGlobal(position))
-        if action == quitAct:
-            self.close()
+        self.setup_interace()
 
     def setup_interace(self):
         nii.NavInputInterface.interface_setup(self)
@@ -498,10 +543,11 @@ class NavMainWindow(QMainWindow):
         mainwindow_navigation.setWindowTitle(_translate("mainwindow_navigation", "Navigation"))
         self.button_undo_navi.setText(_translate("mainwindow_navigation", "Undo"))
         self.button_redo_navi.setText(_translate("mainwindow_navigation", "Redo"))
-        self.label_navigation_navi.setText(_translate("mainwindow_navigation", "Navigation"))
+        self.label_navigation_navi.setText(_translate("mainwindow_navigation", "Log Entry Configuration"))
         self.button_push_navi.setText(_translate("mainwindow_navigation", "Push"))
         self.button_pull_navi.setText(_translate("mainwindow_navigation", "Pull"))
         self.button_vectortableview_navi.setText(_translate("mainwindow_navigation", "Vector Table View"))
+        self.label_filterconfiguration_navi.setText(_translate("mainwindow_navigation", "Filter Configuration"))
         self.label_location_navi.setText(_translate("mainwindow_navigation", "Location"))
         self.label_showhide_navi.setText(_translate("mainwindow_navigation", "Show/Hide"))
         self.checkbox_listnumber_navi.setText(_translate("mainwindow_navigation", "List Number"))
@@ -509,47 +555,20 @@ class NavMainWindow(QMainWindow):
         self.checkbox_event_navi.setText(_translate("mainwindow_navigation", "Log Entry Event"))
         self.checkbox_vector_navi.setText(_translate("mainwindow_navigation", "Vector"))
         self.label_time_navi.setText(_translate("mainwindow_navigation", "Time"))
-        self.label_starttime_navi.setText(_translate("mainwindow_navigation", "Start Time"))
-        self.label_endtime_navi.setText(_translate("mainwindow_navigation", "End Time"))
-        self.button_timefilter_navi.setText(_translate("mainwindow_navigation", "+ add time filter +"))
+        self.label_starttime_navi.setText(_translate("mainwindow_navigation", "Start Timestamp"))
+        self.label_endtime_navi.setText(_translate("mainwindow_navigation", "End Timestamp"))
+        self.button_timefilter_navi.setText(_translate("mainwindow_navigation", "Add Time Filter +"))
         self.checkbox_significant_navi.setText(_translate("mainwindow_navigation", "Significant"))
-        self.label_team_navi.setText(_translate("mainwindow_navigation", "Team"))
-        self.checkbox_red_navi.setText(_translate("mainwindow_navigation", "Red"))
-        self.checkbox_blue_navi.setText(_translate("mainwindow_navigation", "Blue"))
-        self.checkbox_white_navi.setText(_translate("mainwindow_navigation", "White"))
+        self.label_creator_navi.setText(_translate("mainwindow_navigation", "Creator"))
+        self.checkbox_creator_red_navi.setText(_translate("mainwindow_navigation", "Red"))
+        self.checkbox_creator_blue_navi.setText(_translate("mainwindow_navigation", "Blue"))
+        self.checkbox_creator_white_navi.setText(_translate("mainwindow_navigation", "White"))
+        self.label_eventtype_navi.setText(_translate("mainwindow_navigation", "Event Type"))
+        self.checkbox_eventtype_red_navi.setText(_translate("mainwindow_navigation", "Red"))
+        self.checkbox_eventtype_blue_navi.setText(_translate("mainwindow_navigation", "Blue"))
+        self.checkbox_eventtype_white_navi.setText(_translate("mainwindow_navigation", "White"))
         self.label_vectors_navi.setText(_translate("mainwindow_navigation", "Vectors"))
-        item = self.tablewidget_navi.verticalHeaderItem(0)
-        item.setText(_translate("mainwindow_navigation", "01"))
-        item = self.tablewidget_navi.verticalHeaderItem(1)
-        item.setText(_translate("mainwindow_navigation", "02"))
-        item = self.tablewidget_navi.verticalHeaderItem(2)
-        item.setText(_translate("mainwindow_navigation", "03"))
-        item = self.tablewidget_navi.verticalHeaderItem(3)
-        item.setText(_translate("mainwindow_navigation", "04"))
-        item = self.tablewidget_navi.verticalHeaderItem(4)
-        item.setText(_translate("mainwindow_navigation", "05"))
-        item = self.tablewidget_navi.verticalHeaderItem(5)
-        item.setText(_translate("mainwindow_navigation", "06"))
-        item = self.tablewidget_navi.verticalHeaderItem(6)
-        item.setText(_translate("mainwindow_navigation", "07"))
-        item = self.tablewidget_navi.verticalHeaderItem(7)
-        item.setText(_translate("mainwindow_navigation", "08"))
-        item = self.tablewidget_navi.verticalHeaderItem(8)
-        item.setText(_translate("mainwindow_navigation", "09"))
-        item = self.tablewidget_navi.verticalHeaderItem(9)
-        item.setText(_translate("mainwindow_navigation", "10"))
-        item = self.tablewidget_navi.verticalHeaderItem(10)
-        item.setText(_translate("mainwindow_navigation", "11"))
-        item = self.tablewidget_navi.verticalHeaderItem(11)
-        item.setText(_translate("mainwindow_navigation", "12"))
-        item = self.tablewidget_navi.verticalHeaderItem(12)
-        item.setText(_translate("mainwindow_navigation", "13"))
-        item = self.tablewidget_navi.verticalHeaderItem(13)
-        item.setText(_translate("mainwindow_navigation", "14"))
-        item = self.tablewidget_navi.verticalHeaderItem(14)
-        item.setText(_translate("mainwindow_navigation", "15"))
-        item = self.tablewidget_navi.verticalHeaderItem(15)
-        item.setText(_translate("mainwindow_navigation", "16"))
+
         item = self.tablewidget_navi.horizontalHeaderItem(0)
         item.setText(_translate("mainwindow_navigation", "List Number"))
         item = self.tablewidget_navi.horizontalHeaderItem(1)
@@ -562,6 +581,7 @@ class NavMainWindow(QMainWindow):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     app.setStyle(QStyleFactory.create('Fusion'))

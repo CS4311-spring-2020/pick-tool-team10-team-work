@@ -2,11 +2,12 @@ from PyQt5.QtCore import QDateTime
 from PyQt5.QtWidgets import QDateTimeEdit, QLineEdit, QMessageBox
 
 import timefilter_dialog as td
+#from timefilter_dialog import TimefilterDialog
 
 
 class TimefilterInputInterface:
 
-    #timefilter_dialog = td.TimefilterDialog
+    #timefilter_dialog = TimefilterDialog
     timefilter_dialog = None
 
     @staticmethod
