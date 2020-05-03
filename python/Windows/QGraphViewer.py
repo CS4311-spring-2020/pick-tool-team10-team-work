@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QFileDialog, QDialog, QApplication, QWidget, QMainWi
 import sys
 import os
 import time
-
+from sys import platform
 print(sys.path)
 from QGraphViz import QGraphViz, QGraphVizManipulationMode
 from DotParser import Graph, GraphType
@@ -70,14 +70,14 @@ if __name__ == "__main__":
         hilight_Edges=True
     )
 
-    redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/redTeam.png"
-    whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/whiteTeam.png"
-    blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/blueTeam.png"
-
-    #For Windows(change to backslash)
-    #redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\redTeam.png"
-    #whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\whiteTeam.png"
-    #blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\blueTeam.png"
+    if platform == "win32":
+    	redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\redTeam.png"
+    	whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\whiteTeam.png"
+    	blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\blueTeam.png"
+    else:
+    	redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/redTeam.png"
+    	whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/whiteTeam.png"
+    	blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/blueTeam.png"
 
     qgv.setStyleSheet("background-color:white;")
     # Create A new Graph using Dot layout engine
