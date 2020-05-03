@@ -54,7 +54,7 @@ class MainApp(QMainWindow):
 
         #Clean file containing team folder log files
         file_descriptor = open(filepath, 'w')
-        file_descriptor.write('\n\n\n')
+        file_descriptor.write('\n\n\n\n')
         file_descriptor.close()
 
         #Clean file containing the date range for log files

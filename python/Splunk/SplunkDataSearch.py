@@ -1,13 +1,23 @@
 import requests
 from xml.etree import cElementTree as ET
 import json
+from os import path
 
 class SplunkDataSearch():
     def __init__(self):
         self.user = ""
         self.password = ""
         
-        searchQuery = "source=/root/Desktop/splunkuploadtest*"
+        #retrive root path that will be where to start searching from
+        basepath = path.dirname(__file__)
+        filepath = path.abspath(path.join(basepath, "../Data", "ProjectConfigData.txt"))
+        with open(filepath, 'r') as file:
+            data = file.readlines()
+        data[0] = data[0].strip('\n')
+        searchpath = 'source='+data[0]+'*'
+        print(searchpath)
+
+        searchQuery = searchpath
 
         sessionID = self.search(searchQuery)
 
@@ -76,9 +86,13 @@ class SplunkDataSearch():
         index = 1
         self.item_return = []
         for entry in jsonObject['results']:
-            #print()
-            #print("Log Entry: {}".format(entry['_raw']))
-            #print("Timestamp: {}".format(entry['_time']))
             stringconversion = "Log Entry Number: " + str(index)
-            self.item_return.append([stringconversion, entry['_time'], entry['_raw']])
+            filepath_logentry = entry['source'].split('/')
+            team = ''
+            #finding team responsible for the file
+            for item in filepath_logentry:
+                if (item == 'Red') or (item == 'Blue') or (item == 'White'):
+                    team = item
+            #log entry number, time of upload, data in entry, team, file path
+            self.item_return.append([stringconversion, entry['_time'], entry['_raw'], team, entry['source']])
             index +=1

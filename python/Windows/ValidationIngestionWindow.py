@@ -197,22 +197,22 @@ class ValidationIngestionWindow(QMainWindow):
         logentrynamelayout.addWidget(self.logentrynamelabel)
         logentrynamelayout.addStretch()
 
-        logentryteamlabel = QLabel('Team: R|B|W')
+        self.logentryteamlabel = QLabel('Team: R|B|W')
 
         logentryteamlayout.addStretch()
-        logentryteamlayout.addWidget(logentryteamlabel)
+        logentryteamlayout.addWidget(self.logentryteamlabel)
         logentryteamlayout.addStretch()
 
-        logentrytimelabel = QLabel('Timestamp: Time of the Log Entry')
+        self.logentrytimelabel = QLabel('Timestamp: Time of the Log Entry')
 
         logentrytimelayout.addStretch()
-        logentrytimelayout.addWidget(logentrytimelabel)
+        logentrytimelayout.addWidget(self.logentrytimelabel)
         logentrytimelayout.addStretch()
 
-        logentrypathlabel = QLabel('File Path: File path of file that created the Log Entry')
+        self.logentrypathlabel = QLabel('File Path: File path of file that created the Log Entry')
 
         logentrypathlayout.addStretch()
-        logentrypathlayout.addWidget(logentrypathlabel)
+        logentrypathlayout.addWidget(self.logentrypathlabel)
         logentrypathlayout.addStretch()
 
         logentrydatalabel = QLabel('Data:    ')
@@ -278,12 +278,20 @@ class ValidationIngestionWindow(QMainWindow):
             #For every string in the list
             for index2 in range(0, len(data)):
                 clean_string = ''
+                new_line = False
+                #Check for new line at the end of string, make note of it to add it once the string is clean
+                if '\n' in data[index2]:
+                    new_line = True
+                    data[index2] = data[index2][:-1]
                 #Iterate through the string
                 for character in data[index2]:
                     #Remove any unnecessary characters not within range from [space] to ~ in ASCII
                     if (ord(character) >= 32) and (ord(character) <= 126):
                         clean_string += character
-                data[index2] = clean_string
+                if new_line:
+                    data[index2] = clean_string + '\n'
+                else:
+                    data[index2] = clean_string
 
             #Write the cleaned version back into the file
             with open(self.cleansefilelist[index1], 'w') as file:
@@ -314,6 +322,9 @@ class ValidationIngestionWindow(QMainWindow):
         with open(filepath, 'r') as file:
             data = file.readlines()
 
+        #remove the root path as it is not needed here
+        del data[0]
+
         #create list for directories
         for directory in data:
             dirlist.append(directory.rstrip())
@@ -324,8 +335,10 @@ class ValidationIngestionWindow(QMainWindow):
         #year, month, day
         start_date_list = data2[0].split('.')
         start_date_list = [int(i) for i in start_date_list]
+        print(start_date_list)
         end_date_list = data2[1].split('.')
         end_date_list = [int(i) for i in end_date_list]
+        print(end_date_list)
 
         #iterate through the list of directories
         for directory in dirlist:
@@ -335,6 +348,7 @@ class ValidationIngestionWindow(QMainWindow):
                     stat = os.stat(os.path.join(r, file))
                     file_time = (time.strftime('%Y.%m.%d', time.localtime(stat.st_mtime))).split('.')
                     file_time = [int(i) for i in file_time]
+                    #print(file_time)
                     #check if the file is within the date range; if not, ignore it
                     #first check the year
                     if (start_date_list[0] <= file_time[0]) and (file_time[0] <= end_date_list[0]):
@@ -403,7 +417,6 @@ class ValidationIngestionWindow(QMainWindow):
         if getSelected:
             baseNode = getSelected[0]
             getChildNode = baseNode.text(0)
-        self.ingestibletree.clearSelection()
         self.change_logentry_display(getChildNode)
 
     #Selection of item on noningestibletree widget
@@ -413,7 +426,6 @@ class ValidationIngestionWindow(QMainWindow):
         if getSelected:
             baseNode = getSelected[0]
             getChildNode = baseNode.text(0)
-        self.noningestibletree.clearSelection()
         self.change_logentry_display(getChildNode)
 
     #Change log entry information
@@ -422,7 +434,10 @@ class ValidationIngestionWindow(QMainWindow):
 
         #Retrieving information of that item
         num = int(name.split()[3]) - 1
+        self.logentrytimelabel.setText(self.searched_list[num][2].split()[0] + ' ' + self.searched_list[num][2].split()[1])
         self.logentrydataptedit.setPlainText(self.searched_list[num][2])
+        self.logentryteamlabel.setText('Team: ' + self.searched_list[num][3])
+        self.logentrypathlabel.setText('File Path: ' + self.searched_list[num][4])
 
     #On validate button click call splunk method
     def on_validate_button_clicked(self):
