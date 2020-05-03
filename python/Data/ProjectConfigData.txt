@@ -1,0 +1,4 @@
+/root/Desktop/se2fbsenv/venv
+/root/Desktop/splunkuploadtest1
+/root/Desktop/splunkuploadtest2
+/root/Desktop/splunkuploadtest3

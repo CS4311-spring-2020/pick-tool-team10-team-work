@@ -2,8 +2,8 @@ from .ValidationIngestionWindow import ValidationIngestionWindow
 from Dialogs.DirDialog import DirDialog
 from Dialogs.CalendarDialog import CalendarDialog
 from os import path
+import os
 
-#from PyQt5.QtCore import QDate
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QStyle
 
@@ -32,17 +32,17 @@ class ProjectConfigWindow(QMainWindow):
         endtimelayout = QHBoxLayout()
         configcompletelayout = QHBoxLayout()
 
-        eventnamelabel = QLabel('Event Name:')
-        eventnameledit = QLineEdit('Event name goes here.')
+        eventnamelabel = QLabel('Project Name:')
+        self.eventnameledit = QLineEdit('Project name goes here.')
 
         eventnamelayout.addWidget(eventnamelabel)
-        eventnamelayout.addWidget(eventnameledit)
+        eventnamelayout.addWidget(self.eventnameledit)
 
-        eventdesclabel = QLabel('Event Description:')
-        eventdescledit = QLineEdit('Event description goes here.')
+        eventdesclabel = QLabel('Project Description:')
+        self.eventdescledit = QLineEdit('Project description goes here.')
 
         eventdesclayout.addWidget(eventdesclabel)
-        eventdesclayout.addWidget(eventdescledit)
+        eventdesclayout.addWidget(self.eventdescledit)
 
         rootpathlabel = QLabel('Root Path:')
         self.rootpathledit = QLineEdit('Root path goes here.')
@@ -105,12 +105,13 @@ class ProjectConfigWindow(QMainWindow):
         startcontainerlayout.addLayout(startdatelayout)
         startcontainerlayout.addLayout(starttimelayout)
 
-        enddatebutt = QPushButton('Select a end date.')
-        enddatebutt.clicked.connect(self.on_enddate_button_clicked)
+        self.enddatebutt = QPushButton('Select a end date.')
+        self.enddatebutt.clicked.connect(self.on_enddate_button_clicked)
         self.selectenddatelabel = QLabel('No End Date Selected')
+        self.enddatebutt.setEnabled(False)
 
         enddatelayout.addStretch()
-        enddatelayout.addWidget(enddatebutt)
+        enddatelayout.addWidget(self.enddatebutt)
         enddatelayout.addStretch()
 
         endtimelayout.addStretch()
@@ -194,13 +195,25 @@ class ProjectConfigWindow(QMainWindow):
         datechosen =  calwindow.date_picked
         self.minimumdate = [calwindow.minimumdatelist[0], int(calwindow.minimumdatelist[1]), int(calwindow.minimumdatelist[2])] #[month, day, year]
         self.selectstartdatelabel.setText('Start Date Selected: ' + datechosen)
-        print(datechosen)
-        """
-        #For debugging purposes
+
+        basepath = path.dirname(__file__)
+        filepath = path.abspath(path.join(basepath, "../Data", "DateRange.txt"))
+        with open(filepath, 'r') as file:
+            data = file.readlines()
+        if not data:
+            data.append(str(self.minimumdate[2]) + '.' + str(self.minimumdate[0]) + '.' + str(self.minimumdate[1]) + '\n') #year.month.day
+        else:
+            data[0] = str(self.minimumdate[2]) + '.' + str(self.minimumdate[0]) + '.' + str(self.minimumdate[1]) + '\n' #year.month.day
+        with open(filepath, 'w') as file:
+            file.writelines( data )
+
+        self.enddatebutt.setEnabled(True)
+        
+        """ #For debugging purposes
         print(self.minimumdate[0])
         print(self.minimumdate[1])
-        print(self.minimumdate[2])
-        """
+        print(self.minimumdate[2]) """
+       
 
     def on_enddate_button_clicked(self):
         self.end_date_calendar = True
@@ -208,9 +221,27 @@ class ProjectConfigWindow(QMainWindow):
         calwindow = CalendarDialog(self)
         calwindow.exec_()
         datechosen =  calwindow.date_picked
+        self.maximumdate = [calwindow.maximumdatelist[0], int(calwindow.maximumdatelist[1]), int(calwindow.maximumdatelist[2])] #[month, day, year]
         self.selectenddatelabel.setText('End Date Selected: ' + datechosen)
 
+        basepath = path.dirname(__file__)
+        filepath = path.abspath(path.join(basepath, "../Data", "DateRange.txt"))
+        with open(filepath, 'r') as file:
+            data = file.readlines()
+        try:
+            data[1] = str(self.maximumdate[2]) + '.' + str(self.maximumdate[0]) + '.' + str(self.maximumdate[1]) + '\n' #year.month.day
+        except:
+            data.append(str(self.maximumdate[2]) + '.' + str(self.maximumdate[0]) + '.' + str(self.maximumdate[1]) + '\n') #year.month.day
+        with open(filepath, 'w') as file:
+            file.writelines( data )
+
     def on_config_button_clicked(self):
+        basepath = path.dirname(__file__)
+        filepath = path.abspath(path.join(basepath, "../Data", "ProjectDescription.txt"))
+        file_descriptor = open(filepath, 'w')
+        file_descriptor.write(self.eventnameledit.text()+'\n'+self.eventdescledit.text()+'\n')
+        file_descriptor.close()
+
         self.hide()
         self.window = ValidationIngestionWindow()
         self.window.show()

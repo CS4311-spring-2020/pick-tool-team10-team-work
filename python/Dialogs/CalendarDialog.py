@@ -32,7 +32,7 @@ class CalendarDialog(QDialog):
         mainlayout.addLayout(exitlayout)
         self.setLayout(mainlayout)
 
-    def setMinimumConv(self, date):
+    def date_conv(self, date, min):
         month = {	
         'Jan':1,
 		'Feb':2,
@@ -46,13 +46,18 @@ class CalendarDialog(QDialog):
 		'Oct':10,
 		'Nov':11,
 		'Dec':12}
-        minimumdateconversionlist = date.toString().split()
-        self.minimumdatelist = [month.get(minimumdateconversionlist[1]), minimumdateconversionlist[2], minimumdateconversionlist[3]]
+        conversionlist = date.toString().split()
+        if min:
+            self.minimumdatelist = [month.get(conversionlist[1]), conversionlist[2], conversionlist[3]]
+        else:
+            self.maximumdatelist = [month.get(conversionlist[1]), conversionlist[2], conversionlist[3]]
 
     def show_date(self, date):
         self.date_label.setText(date.toString())
         if self.start_calendar == True:
-            self.setMinimumConv(date)
+            self.date_conv(date, True)
+        else:
+            self.date_conv(date, False)
 
     def on_confirm_button_clicked(self):
         self.date_picked = self.date_label.text()

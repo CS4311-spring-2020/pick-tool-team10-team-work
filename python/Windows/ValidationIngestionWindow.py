@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGr
                             QHeaderView, QFrame, QTreeWidget, QTreeWidgetItem, QPlainTextEdit, QDialog)
 
 import subprocess
+import time
 import os
 
 class ValidationIngestionWindow(QMainWindow):
@@ -303,8 +304,11 @@ class ValidationIngestionWindow(QMainWindow):
     #Create a table widget and populating it with cleansed files
     def create_table_cleanse(self, tablewidget, headerlabels):
         dirlist = []
+        start_date_list = []
+        end_date_list = []
         basepath = os.path.dirname(__file__)
         filepath = os.path.abspath(os.path.join(basepath, "../Data", "ProjectConfigData.txt"))
+        filepath2 = os.path.abspath(os.path.join(basepath, "../Data", "DateRange.txt"))
         
         #read a list of lines into data
         with open(filepath, 'r') as file:
@@ -317,11 +321,31 @@ class ValidationIngestionWindow(QMainWindow):
         for directory in data:
             dirlist.append(directory.rstrip())
 
+        #retrieve date range for the project
+        with open(filepath2, 'r') as file:
+            data2 = file.readlines()
+        #year, month, day
+        start_date_list = data2[0].split('.')
+        start_date_list = [int(i) for i in start_date_list]
+        end_date_list = data2[1].split('.')
+        end_date_list = [int(i) for i in end_date_list]
+
         #iterate through the list of directories
         for directory in dirlist:
             for r, d, f in os.walk(directory):
                 for file in f:
-                    self.cleansefilelist.append(os.path.join(r, file))
+                    #retrieve the time of the file
+                    stat = os.stat(os.path.join(r, file))
+                    file_time = (time.strftime('%Y.%m.%d', time.localtime(stat.st_mtime))).split('.')
+                    file_time = [int(i) for i in file_time]
+                    #check if the file is within the date range; if not, ignore it
+                    #first check the year
+                    if (start_date_list[0] <= file_time[0]) and (file_time[0] <= end_date_list[0]):
+                        #second check the month
+                        if (start_date_list[1] <= file_time[1]) and (file_time[1] <= end_date_list[1]):
+                            #third check the day
+                            if (start_date_list[2] <= file_time[2]) and (file_time[2] <= end_date_list[2]):
+                                self.cleansefilelist.append(os.path.join(r, file))
 
         tablewidget.setRowCount(len(self.cleansefilelist))
         tablewidget.setColumnCount(2)
