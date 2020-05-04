@@ -41,3 +41,6 @@ class Node():
         node_dic["name"]=self.name
         node_dic["kwargs"]=self.kwargs
         return node_dic
+
+    def getID(self):
+        return self.name

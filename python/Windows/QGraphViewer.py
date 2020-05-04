@@ -9,6 +9,7 @@ manipulate them and save them
 """
 from PyQt5.QtWidgets import QFileDialog, QDialog, QApplication, QWidget, QMainWindow, QVBoxLayout, QHBoxLayout, \
     QFormLayout, QComboBox, QPushButton, QInputDialog, QLineEdit, QLabel
+from PyQt5 import QtCore
 import sys
 import os
 import time
@@ -17,6 +18,77 @@ print(sys.path)
 from QGraphViz import QGraphViz, QGraphVizManipulationMode
 from DotParser import Graph, GraphType
 from Engines import Dot
+
+# Example Node Dicitonary of Node ID's with their Node name, team, time-stamp, and node discripiton
+nodeDic = {
+    "0001": {
+        "name":"Node1",
+        "team":"red",
+        "time":"2020-3-3 13:09:40",
+        "description":"SQL Injection",
+    },
+    "0002": {
+        "name":"Node2",
+        "team": "blue",
+        "time": "2020-3-3 13:09:42",
+        "description": "Windows SQL Server Log\nShows Red Team Query"
+    },
+    "0003": {
+        "name": "Node3",
+        "team": "blue",
+        "time": "2020-3-3 13:09:46",
+        "description": "Blue Team is aware of breach"
+    },
+    "0004": {
+        "name": "Node4",
+        "team": "blue",
+        "time": "2020-3-3 13:09:52",
+        "description": "Windows Log Shows Admin Login"
+    },
+    "0005": {
+        "name": "Node5",
+        "team": "white",
+        "time": "2020-3-3 13:09:56",
+        "description": "White Team records action"
+    },
+    "0006": {
+        "name": "Node6",
+        "team": "blue",
+        "time": "2020-3-3 13:10:35",
+        "description": "Windows Log Server Config Change"
+    }
+}
+# Example relationships, Parent node ID's with their children node ID's and label text
+edgeDic = {
+    "0001":{
+        "0002":"[Relationship label text]"
+    },
+    "0002":{
+        "0003":"[Relationship label text]"
+    },
+    "0003":{
+        "0004":"[Relationship label text]",
+        "0005":"[Relationship label text]"
+    },
+    "0005":{
+        "0006":"[Relationship label text]"
+    }
+}
+
+#Visual toggles for node attributes
+showNodeID = False
+showNodeName = True
+showNodeTime = True
+showNodeDesc = True
+
+if platform == "win32":
+    redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\redTeam.png"
+    whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\whiteTeam.png"
+    blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\blueTeam.png"
+else:
+    redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/redTeam.png"
+    whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/whiteTeam.png"
+    blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/blueTeam.png"
 
 if __name__ == "__main__":
     # Create QT application
@@ -27,6 +99,7 @@ if __name__ == "__main__":
     def node_selected(node):
         if (qgv.manipulation_mode == QGraphVizManipulationMode.Node_remove_Mode):
             print("Node {} removed".format(node))
+            #print("Node with nodeID: "+ node.getID() + "removed")
         else:
             print("Node selected {}".format(node))
 
@@ -47,12 +120,22 @@ if __name__ == "__main__":
 
 
     def node_removed(node):
-        print("Node removed")
+        print("Node with nodeID: "+ node.getID() +" removed")
+        # remove node from node Dictionary
+        print(nodeDic.pop(node.getID()))
 
 
     def edge_removed(node):
         print("Edge removed")
 
+    # Returns next unique node ID available, format ####,  increments value
+    def getNextNodeID():
+        val = len(nodeDic)
+        nextID = format(val, '004d')
+        while nextID in nodeDic:
+            val+=1
+            nextID = format(val, '004d')
+        return nextID
 
     # Create QGraphViz widget
     show_subgraphs = True
@@ -70,81 +153,10 @@ if __name__ == "__main__":
         hilight_Edges=True
     )
 
-    if platform == "win32":
-    	redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\redTeam.png"
-    	whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\whiteTeam.png"
-    	blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"\icon\blueTeam.png"
-    else:
-    	redTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/redTeam.png"
-    	whiteTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/whiteTeam.png"
-    	blueTeamIcon = os.path.dirname(os.path.abspath(__file__)) + r"/icon/blueTeam.png"
-
     qgv.setStyleSheet("background-color:white;")
     # Create A new Graph using Dot layout engine
     qgv.new(Dot(Graph("Main_Graph"), show_subgraphs=show_subgraphs))
     # Define a graph
-
-    #Visual toggles for node attributes
-    showNodeID = False
-    showNodeName = True
-    showNodeTime = True
-    showNodeDesc = True
-
-    # Example Node Dicitonary of Node ID's with their Node name, team, time-stamp, and node discripiton
-    nodeDic = {
-        "001": {
-            "name":"Node1",
-            "team":"red",
-            "time":"2020-3-3 13:09:40",
-            "description":"SQL Injection",
-        },
-        "002": {
-            "name":"Node2",
-            "team": "blue",
-            "time": "2020-3-3 13:09:42",
-            "description": "Windows SQL Server Log\nShows Red Team Query"
-        },
-        "003": {
-            "name": "Node3",
-            "team": "blue",
-            "time": "2020-3-3 13:09:46",
-            "description": "Blue Team is aware of breach"
-        },
-        "004": {
-            "name": "Node4",
-            "team": "blue",
-            "time": "2020-3-3 13:09:52",
-            "description": "Windows Log Shows Admin Login"
-        },
-        "005": {
-            "name": "Node5",
-            "team": "white",
-            "time": "2020-3-3 13:09:56",
-            "description": "White Team records action"
-        },
-        "006": {
-            "name": "Node6",
-            "team": "blue",
-            "time": "2020-3-3 13:10:35",
-            "description": "Windows Log Server Config Change"
-        }
-    }
-    # Example relationships, Parent node ID's with their children node ID's and label text
-    edgeDic = {
-        "001":{
-            "002":"[Relationship label text]"
-        },
-        "002":{
-            "003":"[Relationship label text]"
-        },
-        "003":{
-            "004":"[Relationship label text]",
-            "005":"[Relationship label text]"
-        },
-        "005":{
-            "006":"[Relationship label text]"
-        }
-    }
 
     # Adds all the nodes in the node dicitonary to the graph
     for nodeID, nodeInfo in nodeDic.items():
@@ -241,11 +253,17 @@ if __name__ == "__main__":
 
 
     def add_node():
+        newNodeID = getNextNodeID()
         dlg = QDialog()
+        dlg.setWindowTitle('Add New Node')
+        dlg.setWindowFlags(QtCore.Qt.Window|QtCore.Qt.WindowTitleHint|QtCore.Qt.CustomizeWindowHint) #remove close button
         dlg.ok = False
+        dlg.OK = True
         dlg.node_name = ""
-        dlg.node_label = ""
-        dlg.node_type = "None"
+        dlg.node_time = ""
+        dlg.node_desc = ""
+        dlg.node_img = ""
+        dlg.node_team = ""
         # Layouts
         main_layout = QVBoxLayout()
         l = QFormLayout()
@@ -256,34 +274,40 @@ if __name__ == "__main__":
         dlg.setLayout(main_layout)
 
         leNodeName = QLineEdit()
-        leNodeLabel = QLineEdit()
+        leNodeTime = QLineEdit()
+        leNodeDesc = QLineEdit()
         cbxNodeType = QComboBox()
         leImagePath = QLineEdit()
 
         pbOK = QPushButton()
         pbCancel = QPushButton()
 
-        cbxNodeType.addItems(["None", "circle", "box"])
+        cbxNodeType.addItems(["red", "blue", "white"])
         pbOK.setText("&OK")
         pbCancel.setText("&Cancel")
 
-        l.setWidget(0, QFormLayout.LabelRole, QLabel("Node Name"))
-        l.setWidget(0, QFormLayout.FieldRole, leNodeName)
-        l.setWidget(1, QFormLayout.LabelRole, QLabel("Node Label"))
-        l.setWidget(1, QFormLayout.FieldRole, leNodeLabel)
-        l.setWidget(2, QFormLayout.LabelRole, QLabel("Node Type"))
-        l.setWidget(2, QFormLayout.FieldRole, cbxNodeType)
-        l.setWidget(3, QFormLayout.LabelRole, QLabel("Node Image"))
-        l.setWidget(3, QFormLayout.FieldRole, leImagePath)
+        l.setWidget(0, QFormLayout.LabelRole, QLabel("Node ID"))
+        l.setWidget(0, QFormLayout.FieldRole, QLabel(newNodeID))
+        l.setWidget(1, QFormLayout.LabelRole, QLabel("Node Name"))
+        l.setWidget(1, QFormLayout.FieldRole, leNodeName)
+        l.setWidget(2, QFormLayout.LabelRole, QLabel("Node Time-Stamp"))
+        l.setWidget(2, QFormLayout.FieldRole, leNodeTime)
+        l.setWidget(3, QFormLayout.LabelRole, QLabel("Node Description"))
+        l.setWidget(3, QFormLayout.FieldRole, leNodeDesc)
+        l.setWidget(4, QFormLayout.LabelRole, QLabel("Node Team"))
+        l.setWidget(4, QFormLayout.FieldRole, cbxNodeType)
+        l.setWidget(5, QFormLayout.LabelRole, QLabel("Icon Image"))
+        l.setWidget(5, QFormLayout.FieldRole, leImagePath)
 
         def ok():
             dlg.OK = True
             dlg.node_name = leNodeName.text()
-            dlg.node_label = leNodeLabel.text()
+            dlg.node_time = leNodeTime.text()
+            dlg.node_desc = leNodeDesc.text()
+            dlg.node_img = ""
             if (leImagePath.text()):
-                dlg.node_type = leImagePath.text()
-            else:
-                dlg.node_type = cbxNodeType.currentText()
+                dlg.node_img = leImagePath.text()
+            dlg.node_team = cbxNodeType.currentText()
             dlg.close()
 
         def cancel():
@@ -297,9 +321,48 @@ if __name__ == "__main__":
         buttons_layout.addWidget(pbCancel)
         dlg.exec_()
 
-        # node_name, okPressed = QInputDialog.getText(wi, "Node name","Node name:", QLineEdit.Normal, "")
-        if dlg.OK and dlg.node_name != '':
-            qgv.addNode(qgv.engine.graph, dlg.node_name, label=dlg.node_label, shape=dlg.node_type)
+        # Adds new node to node Dictionary and graph if OK is selected
+        if dlg.OK:
+            print(1)
+            # Add node to Dictionary
+            nodeDic[newNodeID] = {
+                "name": dlg.node_name,
+                "team": dlg.node_team,
+                "time": dlg.node_time,
+                "description": dlg.node_desc
+            }
+            print(2)
+            # Add node to graph
+            nodeText = ""
+            if (showNodeID):
+                nodeText += newNodeID
+                print(3)
+            if (showNodeName and nodeDic[newNodeID]["name"] != ""):
+                nodeText += "\n" + nodeDic[newNodeID]["name"]
+                print(4)
+            if (showNodeTime and nodeDic[newNodeID]["time"] != ""):
+                nodeText += "\n" + nodeDic[newNodeID]["time"]
+                print(5)
+            if (showNodeDesc and nodeDic[newNodeID]["description"] != ""):
+                nodeText += "\n" + nodeDic[newNodeID]["description"]
+                print(6)
+            if (dlg.node_img != ""):
+                team = dlg.node_img
+                print(7)
+            elif(dlg.node_team == "red"):
+                team = redTeamIcon
+                print(8)
+            elif (dlg.node_team == "blue"):
+                team = blueTeamIcon
+                print(9)
+            else:
+                team = whiteTeamIcon
+                print(11)
+            print(nodeText)
+            print(team)
+            nodeDic[newNodeID]["node"] = qgv.addNode(qgv.engine.graph, newNodeID, label=" ", text=nodeText, shape=team)
+
+            print("Added new node with NodeID: " + newNodeID)
             qgv.build()
 
 
