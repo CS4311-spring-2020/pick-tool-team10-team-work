@@ -348,14 +348,42 @@ class ValidationIngestionWindow(QMainWindow):
                     stat = os.stat(os.path.join(r, file))
                     file_time = (time.strftime('%Y.%m.%d', time.localtime(stat.st_mtime))).split('.')
                     file_time = [int(i) for i in file_time]
-                    #print(file_time)
+                    print(file_time)
                     #check if the file is within the date range; if not, ignore it
-                    #first check the year
-                    if (start_date_list[0] <= file_time[0]) and (file_time[0] <= end_date_list[0]):
-                        #second check the month
-                        if (start_date_list[1] <= file_time[1]) and (file_time[1] <= end_date_list[1]):
-                            #third check the day
+                    #year
+                    if (start_date_list[0] < file_time[0]) and (file_time[0] < end_date_list[0]):
+                        self.cleansefilelist.append(os.path.join(r, file))
+                    elif (start_date_list[0] == file_time[0]) and (file_time[0] < end_date_list[0]):
+                        #month
+                        if (start_date_list[1] < file_time[1]) and (file_time[1] < 12):
+                            self.cleansefilelist.append(os.path.join(r, file))
+                        elif (start_date_list[1] == file_time[1]):
+                            #day
+                            if (start_date_list[2] <= file_time[2]) and (file_time[2] <= 31):
+                                self.cleansefilelist.append(os.path.join(r, file))
+                    elif (start_date_list[0] < file_time[0]) and (file_time[0] == end_date_list[0]):
+                        #month
+                        if (1 < file_time[1]) and (file_time[1] < end_date_list[1]):
+                            self.cleansefilelist.append(os.path.join(r, file))
+                        elif (file_time[1] == end_date_list[1]):
+                            #day
+                            if (1 <= file_time[2]) and (file_time[2] <= end_date_list[2]):
+                                self.cleansefilelist.append(os.path.join(r, file))
+                    elif (start_date_list[0] == file_time[0]) and (file_time[0] == end_date_list[0]):
+                        #month
+                        if (start_date_list[1] < file_time[1]) and (file_time[1] < end_date_list[1]):
+                            self.cleansefilelist.append(os.path.join(r, file))
+                        elif (start_date_list[1] == file_time[1]) and (file_time[1] == end_date_list[1]):
+                            #day
                             if (start_date_list[2] <= file_time[2]) and (file_time[2] <= end_date_list[2]):
+                                self.cleansefilelist.append(os.path.join(r, file))
+                        elif (start_date_list[1] == file_time[1]):
+                            #day
+                            if (start_date_list[2] <= file_time[2]) and (file_time[2] <= 31):
+                                self.cleansefilelist.append(os.path.join(r, file))
+                        elif (file_time[1] == end_date_list[1]):
+                            #day
+                            if (1 <= file_time[2]) and (file_time[2] <= end_date_list[2]):
                                 self.cleansefilelist.append(os.path.join(r, file))
 
         tablewidget.setRowCount(len(self.cleansefilelist))
