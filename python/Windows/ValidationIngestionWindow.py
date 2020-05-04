@@ -436,6 +436,7 @@ class ValidationIngestionWindow(QMainWindow):
             event_desc_index += 13
             dblist[index].append(self.searched_list[index][2][event_desc_index:]) #string
         #print(dblist)
+        return dblist
 
     #Splunk method to upload to local splunk server
     def push_to_splunk(self, tablewidget):
