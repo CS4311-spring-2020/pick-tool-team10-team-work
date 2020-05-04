@@ -335,10 +335,8 @@ class ValidationIngestionWindow(QMainWindow):
         #year, month, day
         start_date_list = data2[0].split('.')
         start_date_list = [int(i) for i in start_date_list]
-        print(start_date_list)
         end_date_list = data2[1].split('.')
         end_date_list = [int(i) for i in end_date_list]
-        print(end_date_list)
 
         #iterate through the list of directories
         for directory in dirlist:
@@ -348,7 +346,6 @@ class ValidationIngestionWindow(QMainWindow):
                     stat = os.stat(os.path.join(r, file))
                     file_time = (time.strftime('%Y.%m.%d', time.localtime(stat.st_mtime))).split('.')
                     file_time = [int(i) for i in file_time]
-                    print(file_time)
                     #check if the file is within the date range; if not, ignore it
                     #year
                     if (start_date_list[0] < file_time[0]) and (file_time[0] < end_date_list[0]):
@@ -415,6 +412,31 @@ class ValidationIngestionWindow(QMainWindow):
         header = tablewidget.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.Stretch)
 
+    #Create database list
+    def create_dblist(self):
+        dblist = []
+        for index in range(len(self.searched_list)):
+            dblist.append([])
+        #First remove unnecessary items
+        for index in range(len(self.searched_list)):
+            #The number of the log entry
+            dblist[index].append(int((self.searched_list[index][0].split()[3:])[0])) #int
+            #The team for the log file
+            dblist[index].append(self.searched_list[index][3]) #string
+            #Timestamp of log entry
+            dblist[index].append(self.searched_list[index][2].split()[1]) #string, format YYYY.M.D
+            #Filepath of log file responsible for log entry
+            dblist[index].append(self.searched_list[index][4]) #string
+            #Location specified in the log entry
+            dblist[index].append(self.searched_list[index][2].split()[3]) #string
+            #Event type
+            dblist[index].append(self.searched_list[index][2].split()[5]) #string
+            #Event description
+            event_desc_index = self.searched_list[index][2].find('Description:')
+            event_desc_index += 13
+            dblist[index].append(self.searched_list[index][2][event_desc_index:]) #string
+        #print(dblist)
+
     #Splunk method to upload to local splunk server
     def push_to_splunk(self, tablewidget):
         for row in range(tablewidget.rowCount()):
@@ -425,6 +447,8 @@ class ValidationIngestionWindow(QMainWindow):
         test = SplunkDataSearch()
         #The list will be inverted
         self.searched_list = test.item_return
+        self.database_list = self.create_dblist()
+        #print(self.searched_list)
         #Change the validate table to mark it as validated
         for index in range(0, len(self.searched_list)):
             validate_item = QTableWidgetItem('yes')
