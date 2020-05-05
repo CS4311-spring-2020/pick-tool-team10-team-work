@@ -1,0 +1,4 @@
+/Users/aaronrodriguez/Desktop/data
+/Users/aaronrodriguez/Desktop/data/Red
+/Users/aaronrodriguez/Desktop/data/Blue
+/Users/aaronrodriguez/Desktop/data/White

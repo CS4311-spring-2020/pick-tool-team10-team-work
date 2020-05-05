@@ -1,0 +1,32 @@
+graph {
+    0001 [label= ,text=
+Node1
+2020-3-3 13:09:40
+SQL Injection,shape=/Users/aaronrodriguez/Documents/JetBrains_Projects/Pycharm_Projects/Final_PICK/Windows/icon/redTeam.png]
+    0002 [label= ,text=
+Node2
+2020-3-3 13:09:42
+Windows SQL Server Log
+Shows Red Team Query,shape=/Users/aaronrodriguez/Documents/JetBrains_Projects/Pycharm_Projects/Final_PICK/Windows/icon/blueTeam.png]
+    0003 [label= ,text=
+Node3
+2020-3-3 13:09:46
+Blue Team is aware of breach,shape=/Users/aaronrodriguez/Documents/JetBrains_Projects/Pycharm_Projects/Final_PICK/Windows/icon/blueTeam.png]
+    0004 [label= ,text=
+Node4
+2020-3-3 13:09:52
+Windows Log Shows Admin Login,shape=/Users/aaronrodriguez/Documents/JetBrains_Projects/Pycharm_Projects/Final_PICK/Windows/icon/blueTeam.png]
+    0005 [label= ,text=
+Node5
+2020-3-3 13:09:56
+White Team records action,shape=/Users/aaronrodriguez/Documents/JetBrains_Projects/Pycharm_Projects/Final_PICK/Windows/icon/whiteTeam.png]
+    0006 [label= ,text=
+Node6
+2020-3-3 13:10:35
+Windows Log Server Config Change,shape=/Users/aaronrodriguez/Documents/JetBrains_Projects/Pycharm_Projects/Final_PICK/Windows/icon/blueTeam.png]
+    0001 -- 0002
+    0002 -- 0003
+    0003 -- 0004
+    0003 -- 0005
+    0005 -- 0006
+}
