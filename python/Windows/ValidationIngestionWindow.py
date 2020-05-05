@@ -1,4 +1,6 @@
-from .mainwindow_nav import Ui_mainwindow_navigation
+import pprint
+
+from Database.databse_interface import DatabaseInterface
 from Splunk.SplunkDataSearch import SplunkDataSearch
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
@@ -8,12 +10,15 @@ import subprocess
 import time
 import os
 
+from .nav_mainwindow import NavMainWindow
+
+
 class ValidationIngestionWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.completed = 0
         self.setWindowTitle('Validation and Ingestion Process')
-        self.setFixedSize(1000, 800)
+        self.setFixedSize(1000, 600)
         mainwidget = QWidget()
         self.setCentralWidget(mainwidget)
         mainlayout = QVBoxLayout()
@@ -442,13 +447,32 @@ class ValidationIngestionWindow(QMainWindow):
     def push_to_splunk(self, tablewidget):
         for row in range(tablewidget.rowCount()):
             twi0 = tablewidget.item(row,0)
-            splunkcmd = subprocess.run(["/opt/splunk/bin/splunk", "add", "oneshot", twi0.text()])
+            splunkcmd = subprocess.run(["/Applications/Splunk/bin/splunk", "add", "oneshot", twi0.text()])
             #print("The exit code was: %d" % splunkcmd.returncode)
             print(twi0.text())
         test = SplunkDataSearch()
         #The list will be inverted
         self.searched_list = test.item_return
         self.database_list = self.create_dblist()
+
+        log_entry_items: list = list()
+        for item in self.database_list:
+            logentry_item: dict = DatabaseInterface.create_log_entries_item(
+                list_number=str(item[0]),
+                timestamp=str(item[2]),
+                event=str(item[6]),
+                vector='None',
+                location=str(item[4]),
+                creator=str(item[1]),
+                filepath=str(item[3]),
+                eventtype=str(item[5]),
+                vector_id='')
+            log_entry_items.append(logentry_item)
+
+        DatabaseInterface.insert_many_log_entries(log_entries_items=log_entry_items)
+        templist: list = DatabaseInterface.find_log_entries_all()
+        pprint.pprint(templist)
+
         #print(self.searched_list)
         #Change the validate table to mark it as validated
         for index in range(0, len(self.searched_list)):
@@ -499,5 +523,5 @@ class ValidationIngestionWindow(QMainWindow):
     #Move on to the next window[Ui_mainwindow_navigation] on ingest button click
     def on_ingest_button_clicked(self):
         self.hide()
-        self.window = Ui_mainwindow_navigation()
+        self.window = NavMainWindow()
         self.window.show()

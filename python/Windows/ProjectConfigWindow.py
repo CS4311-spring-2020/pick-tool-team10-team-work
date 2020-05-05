@@ -12,7 +12,7 @@ class ProjectConfigWindow(QMainWindow):
         super().__init__()
         self.completed = 0
         self.setWindowTitle('Project Configuration')
-        self.setFixedSize(550, 340)
+        self.setFixedSize(1000, 600)
         mainwidget = QWidget()
         self.setCentralWidget(mainwidget)
         mainlayout = QVBoxLayout()

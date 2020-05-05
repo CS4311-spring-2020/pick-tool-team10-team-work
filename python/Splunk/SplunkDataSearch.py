@@ -2,11 +2,13 @@ import requests
 from xml.etree import cElementTree as ET
 import json
 from os import path
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class SplunkDataSearch():
     def __init__(self):
-        self.user = ""
-        self.password = ""
+        self.user = "ontheroof123"
+        self.password = "12345678"
         
         #retrive root path that will be where to start searching from
         basepath = path.dirname(__file__)
@@ -67,7 +69,7 @@ class SplunkDataSearch():
         params = (('output_mode', 'json'),)
         response = requests.get('https://localhost:8089/services/search/jobs/'+sessionID+'/results', params=params, verify=False, auth=(self.user, self.password))
         jsonObject = json.loads(response.text)
-
+        print(response.text)
         # Explores json format keys and values
         # for key in jsonObject:
         #   value = jsonObject[key] #.get(key,"default")

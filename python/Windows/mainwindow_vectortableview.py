@@ -5,15 +5,19 @@
 # Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
+import os
+import subprocess
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMainWindow
 
-class Ui_mainwindow_vectortableview(object):
 
-    def setupUi(self, mainwindow_vectortableview):
-        mainwindow_vectortableview.setObjectName("mainwindow_vectortableview")
-        mainwindow_vectortableview.resize(816, 576)
-        self.centralwidget = QtWidgets.QWidget(mainwindow_vectortableview)
+class Ui_mainwindow_vectortableview(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setObjectName("mainwindow_vectortableview")
+        self.resize(1000, 1000)
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
@@ -262,8 +266,8 @@ class Ui_mainwindow_vectortableview(object):
         self.hl_noderelationships_gv.addLayout(self.vl_nodefilters_hl_noderelationships_gv)
         self.vl_allwindow_gv.addLayout(self.hl_noderelationships_gv)
         self.gridLayout.addLayout(self.vl_allwindow_gv, 0, 0, 1, 1)
-        mainwindow_vectortableview.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(mainwindow_vectortableview)
+        self.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 816, 22))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -273,14 +277,14 @@ class Ui_mainwindow_vectortableview(object):
         self.menubar.setObjectName("menubar")
         self.menuVectors = QtWidgets.QMenu(self.menubar)
         self.menuVectors.setObjectName("menuVectors")
-        mainwindow_vectortableview.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(mainwindow_vectortableview)
+        self.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
-        mainwindow_vectortableview.setStatusBar(self.statusbar)
+        self.setStatusBar(self.statusbar)
         self.menubar.addAction(self.menuVectors.menuAction())
 
-        self.retranslateUi(mainwindow_vectortableview)
-        QtCore.QMetaObject.connectSlotsByName(mainwindow_vectortableview)
+        self.retranslateUi(self)
+        QtCore.QMetaObject.connectSlotsByName(self)
         self.button_setup()
 
     def button_setup(self):
@@ -412,16 +416,19 @@ class Ui_mainwindow_vectortableview(object):
         self.button_pull_gv.toggle()
 
     def navigation_button_gv_clicked(self):
-        from mainwindow_nav import Ui_mainwindow_navigation
-        self.window = QtWidgets.QMainWindow()
-        self.ui = Ui_mainwindow_navigation()
-        self.ui.setupUi(self.window)
-        mainwindow_vectortableview.hide()
-        self.window.show()
+        print('awef')
+        #from mainwindow_nav import Ui_mainwindow_navigation
+        #self.window = QtWidgets.QMainWindow()
+        #self.ui = Ui_mainwindow_navigation()
+        #self.ui.setupUi(self.window)
+        #mainwindow_vectortableview.hide()
+        #self.window.show()
 
     def button_viewgraph_gv_clicked(self):
         print(self.button_viewgraph_gv.text())
         self.button_viewgraph_gv.toggle()
+        file_name = os.path.dirname(os.path.abspath(__file__)) + r"/QGraphViewer.py"
+        subprocess.run(['python3', file_name])
 
     def button_addnode_gv_clicked(self):
         print(self.button_addnode_gv.text())
@@ -438,12 +445,3 @@ class Ui_mainwindow_vectortableview(object):
     def button_deleterelationship_gv_clicked(self):
         print(self.button_deleterelationship_gv.text())
         self.button_deleterelationship_gv.toggle()
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    mainwindow_vectortableview = QtWidgets.QMainWindow()
-    ui = Ui_mainwindow_vectortableview()
-    ui.setupUi(mainwindow_vectortableview)
-    mainwindow_vectortableview.show()
-    sys.exit(app.exec_())
