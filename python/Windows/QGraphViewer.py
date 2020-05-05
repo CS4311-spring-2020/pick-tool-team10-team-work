@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QFileDialog, QDialog, QApplication, QWidget, QMainWindow, QVBoxLayout, QHBoxLayout, \
-    QFormLayout, QComboBox, QPushButton, QInputDialog, QLineEdit, QLabel
+    QFormLayout, QComboBox, QPushButton, QInputDialog, QLineEdit, QLabel, QCheckBox
 from PyQt5 import QtCore
 import sys
 import os
@@ -374,6 +374,65 @@ if __name__ == "__main__":
         if (fname[0] != ""):
             qgv.loadAJson(fname[0])
 
+
+    def nodeIDChk():
+        global showNodeID
+        if showNodeID == False:
+            showNodeID = True
+            print("node ID checked")
+        else:
+            showNodeID = False
+            print("node ID unchecked")
+        updateText()
+
+    def nodeNameChk():
+        global showNodeName
+        if showNodeName == False:
+            showNodeName = True
+            print("node name checked")
+        else:
+            showNodeName = False
+            print("node name unchecked")
+        updateText()
+
+    def nodeTimeChk():
+        global showNodeTime
+        if showNodeTime == False:
+            showNodeTime = True
+            print("node time checked")
+        else:
+            showNodeTime = False
+            print("node time unchecked")
+        updateText()
+
+    def nodeDescChk():
+        global showNodeDesc
+        if showNodeDesc == False:
+            showNodeDesc = True
+            print("node description checked")
+        else:
+            showNodeDesc = False
+            print("node description unchecked")
+        updateText()
+
+    def updateText():
+        global nodeDic
+        print("updating Text")
+        for nodeID, nodeInfo in nodeDic.items():
+            node = nodeDic[nodeID]["node"]
+            nodeText = ""
+            if (showNodeID and nodeID != ""):
+                nodeText += nodeID
+            if (showNodeName and nodeInfo["name"] != ""):
+                nodeText += "\n" + nodeInfo["name"]
+            if (showNodeTime and nodeInfo["time"] != ""):
+                nodeText += "\n" + nodeInfo["time"]
+            if (showNodeDesc and nodeInfo["description"] != ""):
+                nodeText += "\n" + nodeInfo["description"]
+            node.setText(nodeText)
+        qgv.build()
+
+
     def add_node():
         newNodeID = getNextNodeID()
         dlg = QDialog()
@@ -618,13 +677,52 @@ if __name__ == "__main__":
     #btnNew = QPushButton("New")
     #btnNew.clicked.connect(new)
 
+    # Default values
+    # showNodeID = False
+    # showNodeName = True
+    # showNodeTime = True
+    # showNodeDesc = True
+
+    chkBx = QCheckBox("Node ID")
+    if showNodeID == True:
+        chkBx.setCheckState(QtCore.Qt.Checked)
+    else:
+        chkBx.setCheckState(QtCore.Qt.Unchecked)
+    chkBx.setTristate(False)
+    chkBx.clicked.connect(nodeIDChk)
+
+    chkBx2 = QCheckBox("Node Name")
+    if showNodeName == True:
+        chkBx2.setCheckState(QtCore.Qt.Checked)
+    else:
+        chkBx2.setCheckState(QtCore.Qt.Unchecked)
+    chkBx2.setTristate(False)
+    chkBx2.clicked.connect(nodeNameChk)
+
+    chkBx3 = QCheckBox("Node Time")
+    if showNodeTime == True:
+        chkBx3.setCheckState(QtCore.Qt.Checked)
+    else:
+        chkBx3.setCheckState(QtCore.Qt.Unchecked)
+    chkBx3.setTristate(False)
+    chkBx3.clicked.connect(nodeTimeChk)
+
+    chkBx4 = QCheckBox("Node Desc")
+    if showNodeName == True:
+        chkBx4.setCheckState(QtCore.Qt.Checked)
+    else:
+        chkBx4.setCheckState(QtCore.Qt.Unchecked)
+    chkBx4.setTristate(False)
+    chkBx4.clicked.connect(nodeDescChk)
+
+    #stateChanged(int state)
+
     btnOpen = QPushButton("Open")
     btnOpen.clicked.connect(load)
 
     btnSave = QPushButton("Save")
     btnSave.clicked.connect(save)
 
-    #hpanel.addWidget(btnNew)
     hpanel.addWidget(btnOpen)
     hpanel.addWidget(btnSave)
 
@@ -658,6 +756,16 @@ if __name__ == "__main__":
     btnRemEdge.clicked.connect(rem_edge)
     hpanel.addWidget(btnRemEdge)
     buttons_list.append(btnRemEdge)
+
+    # Add vertical layout(show toggles)
+    vpanel = QVBoxLayout()
+    hpanel.layout().addLayout(vpanel)
+
+    #hpanel.addWidget(btnNew)
+    vpanel.addWidget(chkBx)
+    vpanel.addWidget(chkBx2)
+    vpanel.addWidget(chkBx3)
+    vpanel.addWidget(chkBx4)
 
     w.showMaximized()
 
