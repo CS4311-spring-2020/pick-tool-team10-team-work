@@ -42,7 +42,6 @@ class TimefilterInputInterface:
 
     @staticmethod
     def button_ok_tfil_clicked():
-        # TODO Repeated Code
         start_datetime = TimefilterInputInterface.timefilter_dialog.datetimeedit_starttime_tfil.dateTime()
         end_datetime = TimefilterInputInterface.timefilter_dialog.datetimeedit_endtime_tfil.dateTime()
         start_datetime_info = start_datetime.toString('yyyyMMddhhmmss')

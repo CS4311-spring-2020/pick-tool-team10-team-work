@@ -2,10 +2,10 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu
 import sys
 
-from nav_databse_interface import NavDatabaseInterface
+from databse_interface import NavDatabaseInterface
 import pymongo
 import pprint
-
+'''
 locations = {
     0: 'El Paso',
     1: 'Santa Fe',
@@ -42,6 +42,23 @@ for i in range(100):
 
 pprint.pprint(insert_items)
 NavDatabaseInterface.insert_many_log_entries(insert_items)
+'''
+awef = NavDatabaseInterface.create_vectors_item(name='awef', description='fewa')
+NavDatabaseInterface.insert_one_vectors(awef)
+temp_list = NavDatabaseInterface.find_vectors_all()
+for item in temp_list:
+    item: dict
+    item['log_entries'].append('lol')
+
+
+temp_list = NavDatabaseInterface.find_vectors_all()
+for item in temp_list:
+    item: dict
+    print(item['log_entries'])
+
+NavDatabaseInterface.delete_vectors_all()
+NavDatabaseInterface.delete_vectors_collection()
+
 #NavDatabaseInterface.delete_all_items_log_entries()
 #NavDatabaseInterface.delete_log_entries_collection()
 

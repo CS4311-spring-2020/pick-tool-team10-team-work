@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'mainwindow_nav.ui'
-#
-# Created by: PyQt5 UI code generator 5.14.1
-#
-# WARNING! All changes made in this file will be lost!
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import pyqtSlot, QDateTime
 import nav_input_interface as nii
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QStyleFactory, QAbstractItemView, QWidget, QMenu
@@ -171,6 +162,10 @@ class NavMainWindow(QMainWindow):
         self.label_filterconfiguration_navi.setObjectName("label_filterconfiguration_navi")
         self.vl_filterconfiguration_navi.addWidget(self.label_filterconfiguration_navi)
 
+        self.checkbox_applyfilter_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.checkbox_applyfilter_navi.setObjectName("checkbox_applyfilter_navi")
+        self.vl_filterconfiguration_navi.addWidget(self.checkbox_applyfilter_navi)
+
         self.vl_allfilters_navi.addLayout(self.vl_filterconfiguration_navi)
 
         self.line07_hl_bottom_navi = QtWidgets.QFrame(self.scrollareacontentwidgets_hl_bottom_navi)
@@ -204,7 +199,7 @@ class NavMainWindow(QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.listview_location_navi.sizePolicy().hasHeightForWidth())
         self.listview_location_navi.setSizePolicy(sizePolicy)
-        self.listview_location_navi.setMinimumSize(QtCore.QSize(0, 100))
+        self.listview_location_navi.setMinimumSize(QtCore.QSize(0, 150))
         self.listview_location_navi.setObjectName("listview_location_navi")
         self.listview_location_navi.setSpacing(5)
         self.vl_locationfilter_navi.addWidget(self.listview_location_navi)
@@ -335,7 +330,7 @@ class NavMainWindow(QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.listview_timefilter_navi.sizePolicy().hasHeightForWidth())
         self.listview_timefilter_navi.setSizePolicy(sizePolicy)
-        self.listview_timefilter_navi.setMinimumSize(QtCore.QSize(0, 100))
+        self.listview_timefilter_navi.setMinimumSize(QtCore.QSize(0, 150))
         self.listview_timefilter_navi.setObjectName("listview_timefilter_navi")
         self.listview_timefilter_navi.setSpacing(5)
         self.vl_timefilter_navi.addWidget(self.listview_timefilter_navi)
@@ -352,6 +347,20 @@ class NavMainWindow(QMainWindow):
         # region significant filter
         self.vl_significantfilter_navi = QtWidgets.QVBoxLayout()
         self.vl_significantfilter_navi.setObjectName("vl_significantfilter_navi")
+
+        self.label_significant_navi = QtWidgets.QLabel(self.scrollareacontentwidgets_hl_bottom_navi)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_significant_navi.sizePolicy().hasHeightForWidth())
+        self.label_significant_navi.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_significant_navi.setFont(font)
+        self.label_significant_navi.setObjectName("label_significant_navi")
+        self.vl_significantfilter_navi.addWidget(self.label_significant_navi)
 
         self.checkbox_significant_navi = QtWidgets.QCheckBox(self.scrollareacontentwidgets_hl_bottom_navi)
         self.checkbox_significant_navi.setObjectName("checkbox_significant_navi")
@@ -468,10 +477,14 @@ class NavMainWindow(QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.listview_vectors_navi.sizePolicy().hasHeightForWidth())
         self.listview_vectors_navi.setSizePolicy(sizePolicy)
-        self.listview_vectors_navi.setMinimumSize(QtCore.QSize(0, 100))
+        self.listview_vectors_navi.setMinimumSize(QtCore.QSize(0, 150))
         self.listview_vectors_navi.setObjectName("listview_vectors_navi")
         self.listview_vectors_navi.setSpacing(5)
         self.vl_vectorsfilter_navi.addWidget(self.listview_vectors_navi)
+
+        self.button_vectorconfig_navi = QtWidgets.QPushButton(self.scrollareacontentwidgets_hl_bottom_navi)
+        self.button_vectorconfig_navi.setObjectName("button_vectorconfig_navi")
+        self.vl_vectorsfilter_navi.addWidget(self.button_vectorconfig_navi)
 
         self.vl_allfilters_navi.addLayout(self.vl_vectorsfilter_navi)
         # endregion
@@ -492,7 +505,7 @@ class NavMainWindow(QMainWindow):
         sizePolicy.setHeightForWidth(self.tablewidget_navi.sizePolicy().hasHeightForWidth())
         self.tablewidget_navi.setSizePolicy(sizePolicy)
         self.tablewidget_navi.setObjectName("tablewidget_navi")
-        self.tablewidget_navi.setColumnCount(4)
+        self.tablewidget_navi.setColumnCount(5)
 
         item = QtWidgets.QTableWidgetItem()
         self.tablewidget_navi.setHorizontalHeaderItem(0, item)
@@ -502,6 +515,10 @@ class NavMainWindow(QMainWindow):
         self.tablewidget_navi.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
         self.tablewidget_navi.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tablewidget_navi.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tablewidget_navi.setHorizontalHeaderItem(4, item)
         self.tablewidget_navi.horizontalHeader().setVisible(True)
         self.tablewidget_navi.horizontalHeader().setCascadingSectionResizes(False)
         self.tablewidget_navi.horizontalHeader().setDefaultSectionSize(150)
@@ -548,6 +565,7 @@ class NavMainWindow(QMainWindow):
         self.button_pull_navi.setText(_translate("mainwindow_navigation", "Pull"))
         self.button_vectortableview_navi.setText(_translate("mainwindow_navigation", "Vector Table View"))
         self.label_filterconfiguration_navi.setText(_translate("mainwindow_navigation", "Filter Configuration"))
+        self.checkbox_applyfilter_navi.setText(_translate("mainwindow_navigation", "Apply Filter"))
         self.label_location_navi.setText(_translate("mainwindow_navigation", "Location"))
         self.label_showhide_navi.setText(_translate("mainwindow_navigation", "Show/Hide"))
         self.checkbox_listnumber_navi.setText(_translate("mainwindow_navigation", "List Number"))
@@ -558,6 +576,7 @@ class NavMainWindow(QMainWindow):
         self.label_starttime_navi.setText(_translate("mainwindow_navigation", "Start Timestamp"))
         self.label_endtime_navi.setText(_translate("mainwindow_navigation", "End Timestamp"))
         self.button_timefilter_navi.setText(_translate("mainwindow_navigation", "Add Time Filter +"))
+        self.label_significant_navi.setText(_translate("mainwindow_navigation", "Significant"))
         self.checkbox_significant_navi.setText(_translate("mainwindow_navigation", "Significant"))
         self.label_creator_navi.setText(_translate("mainwindow_navigation", "Creator"))
         self.checkbox_creator_red_navi.setText(_translate("mainwindow_navigation", "Red"))
@@ -568,14 +587,17 @@ class NavMainWindow(QMainWindow):
         self.checkbox_eventtype_blue_navi.setText(_translate("mainwindow_navigation", "Blue"))
         self.checkbox_eventtype_white_navi.setText(_translate("mainwindow_navigation", "White"))
         self.label_vectors_navi.setText(_translate("mainwindow_navigation", "Vectors"))
+        self.button_vectorconfig_navi.setText(_translate("mainwindow_navigation", "Vector Configuration"))
 
         item = self.tablewidget_navi.horizontalHeaderItem(0)
-        item.setText(_translate("mainwindow_navigation", "List Number"))
+        item.setText(_translate("mainwindow_navigation", ""))
         item = self.tablewidget_navi.horizontalHeaderItem(1)
-        item.setText(_translate("mainwindow_navigation", "Log Entry Timestamp"))
+        item.setText(_translate("mainwindow_navigation", "List Number"))
         item = self.tablewidget_navi.horizontalHeaderItem(2)
-        item.setText(_translate("mainwindow_navigation", "Log Entry Event"))
+        item.setText(_translate("mainwindow_navigation", "Log Entry Timestamp"))
         item = self.tablewidget_navi.horizontalHeaderItem(3)
+        item.setText(_translate("mainwindow_navigation", "Log Entry Event"))
+        item = self.tablewidget_navi.horizontalHeaderItem(4)
         item.setText(_translate("mainwindow_navigation", "Vector"))
 
 
