@@ -1,11 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
-Author: Saifeddine ALOUI
-Description:
-Grapph object
-"""
 import enum
 from DotParser.Node import Node
 from DotParser.Edge import Edge

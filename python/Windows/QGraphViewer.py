@@ -1,12 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
-Author: Saifeddine ALOUI
-Description:
-A simple graphviz graphs viewer that enables creating graphs visually,
-manipulate them and save them
-"""
 from PyQt5.QtWidgets import QFileDialog, QDialog, QApplication, QWidget, QMainWindow, QVBoxLayout, QHBoxLayout, \
     QFormLayout, QComboBox, QPushButton, QInputDialog, QLineEdit, QLabel
 from PyQt5 import QtCore
@@ -14,6 +8,7 @@ import sys
 import os
 import time
 from sys import platform
+import xml.etree.cElementTree as ET
 print(sys.path)
 from QGraphViz import QGraphViz, QGraphVizManipulationMode
 from DotParser import Graph, GraphType
@@ -95,7 +90,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # Events
-
     def node_selected(node):
         if (qgv.manipulation_mode == QGraphVizManipulationMode.Node_remove_Mode):
             print("Node {} removed".format(node))
@@ -103,30 +97,41 @@ if __name__ == "__main__":
         else:
             print("Node selected {}".format(node))
 
-
     def edge_selected(edge):
         if (qgv.manipulation_mode == QGraphVizManipulationMode.Edge_remove_Mode):
             print("Edge {} removed".format(edge))
         else:
             print("Edge selected {}".format(edge))
 
-
     def node_invoked(node):
         print("Node double clicked")
-
+        edit_node(node)
 
     def edge_invoked(node):
         print("Edge double clicked")
 
-
     def node_removed(node):
-        print("Node with nodeID: "+ node.getID() +" removed")
+        nodeID = node.getID()
+        print("Node with nodeID: "+ nodeID +" removed")
         # remove node from node Dictionary
-        print(nodeDic.pop(node.getID()))
+        print(nodeDic.pop(nodeID))
+        if nodeID in edgeDic:
+            edgeDic.pop(nodeID)
+        for parent, children in edgeDic.items():
+                if nodeID in children:
+                    children.pop(nodeID)
 
+    def edge_removed(edge):
+        src = edge.getSource().getID()
+        dest = edge.getDest().getID()
 
-    def edge_removed(node):
-        print("Edge removed")
+        if src in edgeDic:
+            if dest in edgeDic[src]:
+                edgeDic[src].pop(dest)
+            if len(edgeDic[src])==0:
+                edgeDic.pop(src)
+        print(edgeDic)
+        print("Edge removed: source ["+src+"] dest["+dest+"]")
 
     # Returns next unique node ID available, format ####,  increments value
     def getNextNodeID():
@@ -136,6 +141,22 @@ if __name__ == "__main__":
             val+=1
             nextID = format(val, '004d')
         return nextID
+
+    def new_edge_being_added(source, dest):
+        srcName = source.getID()
+        destName = dest.getID()
+        if srcName in edgeDic:
+            if destName in edgeDic[srcName]:
+                print("Edge with same source ["+srcName+"] and dest ["+destName+"] already exists. Edge is not added")
+                return False, {}
+            else:
+                edgeDic[srcName] = {destName: "[Edge Label Text]"}
+                print("Adding edge with source [" + srcName + "] and dest [" + destName + "]")
+                return True, {}
+        else:
+            edgeDic[srcName]={destName:"[Edge Label Text]"}
+            print("Adding edge with source [" + srcName + "] and dest [" + destName + "]")
+            return True,{}
 
     # Create QGraphViz widget
     show_subgraphs = True
@@ -148,6 +169,7 @@ if __name__ == "__main__":
         edge_invoked_callback=edge_invoked,
         node_removed_callback=node_removed,
         edge_removed_callback=edge_removed,
+        new_edge_beingAdded_callback = new_edge_being_added,
 
         hilight_Nodes=True,
         hilight_Edges=True
@@ -189,19 +211,6 @@ if __name__ == "__main__":
         else:
             print("The parent node with ID: "+ parent + " not found")
 
-    # n1 = qgv.addNode(qgv.engine.graph, "Node1", label=" ", text = "Sample Node Name\nNew line\nSomething else", shape= redTeamIcon)
-    # n2 = qgv.addNode(qgv.engine.graph, "Node2", label=" ", shape = blueTeamIcon)
-    # n3 = qgv.addNode(qgv.engine.graph, "Node3", label=" ", shape = blueTeamIcon)
-    # n4 = qgv.addNode(qgv.engine.graph, "Node4", label=" ", shape = blueTeamIcon)
-    # n5 = qgv.addNode(qgv.engine.graph, "Node5", label=" ", shape = whiteTeamIcon)
-    # n6 = qgv.addNode(qgv.engine.graph, "Node3", label=" ", shape = blueTeamIcon)
-    #
-    # qgv.addEdge(n1, n2, {})
-    # qgv.addEdge(n2, n3, {})
-    # qgv.addEdge(n3, n4, {})
-    # qgv.addEdge(n3, n5, {})
-    # qgv.addEdge(n5, n6, {})
-
 
     # Build the graph (the layout engine organizes where the nodes and connections are)
     qgv.build()
@@ -227,30 +236,143 @@ if __name__ == "__main__":
 
 
     def save():
-        fname = QFileDialog.getSaveFileName(qgv, "Save", "", "*.json")
-        if (fname[0] != ""):
+        fname = QFileDialog.getSaveFileName(qgv, "Save", "", "*.json;;*.jpg;;*.png;;*.xml")
+        if(fname[1] == "*.jpg" and fname[0] != ""):
+            qgv.saveAsJpg(fname[0])
+        if (fname[1] == "*.json" and fname[0] != ""):
             qgv.saveAsJson(fname[0])
+        if (fname[1] == "*.png" and fname[0] != ""):
+            qgv.saveAsPng(fname[0])
+        if (fname[1] == "*.xml" and fname[0] != ""):
+            saveAsXml(fname[0])
 
-        # fname = QFileDialog.getSaveFileName(qgv, "Save", "", "*.gv")
-        # if(fname[0]!=""):
-        #    qgv.save(fname[0])
+    # Generates xml file for graph
+    def saveAsXml(filename):
+        # Sets top of xml file
+        graphml = ET.Element('graphml',{'xmlns': "http://graphml.graphdrawing.org/xmlns",
+                                        "xmlns:mtg":"http://maltego.paterva.com/xml/mtgx"})
+        versInf = ET.SubElement(graphml,'VersionInfo', {'createdBy': "Maltego Community Edition",
+                                                        "subtitle": "",
+                                                        "version":"4.2.9.12898"})
+        key1 = ET.SubElement(graphml, 'key', {'attr.name': "MaltegoEntity",
+                                                         "for": "node",
+                                                         "id": "d0"})
+        key2 = ET.SubElement(graphml, 'key', {'for': "node",
+                                             "id": "d1",
+                                             "yfiles.type": "nodegraphics"})
+        key3 = ET.SubElement(graphml, 'key', {'attr.name': "MaltegoLink",
+                                             "for": "edge",
+                                             "id": "d2"})
+        key4 = ET.SubElement(graphml, 'key', {'for': "edge",
+                                             "id": "d3",
+                                             "yfiles.type": "edgegraphics"})
+        graph = ET.SubElement(graphml, 'graph', {'edgedefault': "directed",
+                                             "id": "G",})
+        randNum = 250
+        # Adds nodes to xml file
+        for nodeID, nodeInfo in nodeDic.items():
+            nodeTag = ET.SubElement(graph, 'node',{'id': nodeID})
+            dataTag = ET.SubElement(nodeTag, 'data', {"key":"d0"})
+            entityType = "yourorganization.WhiteTeam"
+            dispName = "White Team"
+            name = "properties.whiteteam"
+            if(nodeInfo["team"]=='red'):
+                entityType = "yourorganization.RedTeam"
+                dispName = "Red Team"
+                name = "properties.redteam"
+            if (nodeInfo["team"] == 'blue'):
+                entityType = "yourorganization.BlueTeam"
+                dispName = "Blue Team"
+                name = "properties.blueteam"
+            idRand = "20nyvatspkbwg"+str(randNum)
+            uniqueID= idRand[-13:]
+            randNum+=1
+            mtgMalt = ET.SubElement(dataTag, 'mtg:MaltegoEntity', {"id": uniqueID,
+                                                                   "type": entityType})
+            mtgProperties = ET.SubElement(mtgMalt,"mtg:Properties")
+            mtgProp = ET.SubElement(mtgProperties, "mtg:Property",{"displayName": dispName,
+                                                                   "hidden": "false",
+                                                                   "name": name,
+                                                                   "nullable":"true",
+                                                                   "readonly":"false",
+                                                                   "type":"string"})
+            mtgValue = ET.SubElement(mtgProp,'mtg:Value')
+            mtgValue.text = nodeInfo["description"]
 
+            mtgNotes = ET.SubElement(mtgMalt,'mtg:Notes')
+            mtgNotes.text = "![CDATA["+ nodeInfo["time"]+"]]"
+
+            dataTag2 = ET.SubElement(nodeTag, 'data', {"key": "d1"})
+            mtgERen = ET.SubElement(dataTag2,"mtg:EntityRenderer")
+            position = nodeInfo["node"].getPos()
+            mtgPos = ET.SubElement(mtgERen,'mtg:Position', {"x": str(position[0]),
+                                                            "y": str(position[1])})
+
+        # Adds edges to xml file
+        counter=0#increment for unique id for each
+        for parent, children in edgeDic.items():
+                for child in children:
+                    edgeID = "e"+str(counter)
+                    counter+=1
+                    edgeTag = ET.SubElement(graph, "edge", {"id": edgeID,
+                                                            "source": parent,
+                                                            "target":child})
+                    dataTag3 = ET.SubElement(edgeTag, 'data',{"key":"d2"})
+                    idRand = "20nyvatspkbwg" + str(counter)
+                    uniqueID = idRand[-13:]
+                    mtgMLink = ET.SubElement(dataTag3, "mtg:MaltegoLink",{"id":uniqueID,
+                                                                          "type":"maltego.link.manual-link"})
+                    mtgPropties = ET.SubElement(mtgMLink, "mtg:Properties")
+                    mtgPropty = ET.SubElement(mtgPropties, "mtg:Property", {"displayName":"Label",
+                                                                            "hidden":"false",
+                                                                            "name":"maltego.link.manual.type",
+                                                                            "nullable":"true",
+                                                                            "readonly":"false",
+                                                                            "type":"string"})
+                    mtgVal = ET.SubElement(mtgPropty, "mtg:Value")
+                    mtgVal.text = ""
+
+                    mtgPropty2 = ET.SubElement(mtgPropties, "mtg:Property", {"displayName":"Show Label",
+                                                                            "hidden":"false",
+                                                                            "name":"maltego.link.show-label",
+                                                                            "nullable":"true",
+                                                                            "readonly":"false",
+                                                                            "type":"int"})
+                    mtgVal2 = ET.SubElement(mtgPropty2, "mtg:Value")
+                    mtgVal2.text = "0"
+
+                    mtgPropty3 = ET.SubElement(mtgPropties, "mtg:Property", {"displayName": "Color",
+                                                                             "hidden": "false",
+                                                                             "name": "maltego.link.color",
+                                                                             "nullable": "true",
+                                                                             "readonly": "false",
+                                                                             "type": "color"})
+                    mtgVal3 = ET.SubElement(mtgPropty3, "mtg:Value")
+                    mtgVal3.text = "#000000"
+
+                    mtgPropty4 = ET.SubElement(mtgPropties, "mtg:Property", {"displayName": "Description",
+                                                                             "hidden": "false",
+                                                                             "name": "maltego.link.manual.description",
+                                                                             "nullable": "true",
+                                                                             "readonly": "false",
+                                                                             "type": "string"})
+                    mtgVal4 = ET.SubElement(mtgPropty4, "mtg:Value")
+
+                    dataTag4 = ET.SubElement(edgeTag, "data",{"key":"d3"})
+                    mtgLingRen = ET.SubElement(dataTag4,"mtg:LinkRenderer")
+
+        tree = ET.ElementTree(graphml)
+        tree.write(filename)
 
     def new():
         qgv.engine.graph = Graph("MainGraph")
         qgv.build()
         qgv.repaint()
 
-
     def load():
         fname = QFileDialog.getOpenFileName(qgv, "Open", "", "*.json")
         if (fname[0] != ""):
             qgv.loadAJson(fname[0])
-
-        # fname = QFileDialog.getOpenFileName(qgv, "Open", "", "*.gv")
-        # if(fname[0]!=""):
-        #    qgv.load_file(fname[0])
-
 
     def add_node():
         newNodeID = getNextNodeID()
@@ -323,7 +445,6 @@ if __name__ == "__main__":
 
         # Adds new node to node Dictionary and graph if OK is selected
         if dlg.OK:
-            print(1)
             # Add node to Dictionary
             nodeDic[newNodeID] = {
                 "name": dlg.node_name,
@@ -331,40 +452,149 @@ if __name__ == "__main__":
                 "time": dlg.node_time,
                 "description": dlg.node_desc
             }
-            print(2)
             # Add node to graph
             nodeText = ""
             if (showNodeID):
                 nodeText += newNodeID
-                print(3)
             if (showNodeName and nodeDic[newNodeID]["name"] != ""):
                 nodeText += "\n" + nodeDic[newNodeID]["name"]
-                print(4)
             if (showNodeTime and nodeDic[newNodeID]["time"] != ""):
                 nodeText += "\n" + nodeDic[newNodeID]["time"]
-                print(5)
             if (showNodeDesc and nodeDic[newNodeID]["description"] != ""):
                 nodeText += "\n" + nodeDic[newNodeID]["description"]
-                print(6)
             if (dlg.node_img != ""):
                 team = dlg.node_img
-                print(7)
             elif(dlg.node_team == "red"):
                 team = redTeamIcon
-                print(8)
             elif (dlg.node_team == "blue"):
                 team = blueTeamIcon
-                print(9)
             else:
                 team = whiteTeamIcon
-                print(11)
-            print(nodeText)
-            print(team)
             nodeDic[newNodeID]["node"] = qgv.addNode(qgv.engine.graph, newNodeID, label=" ", text=nodeText, shape=team)
 
             print("Added new node with NodeID: " + newNodeID)
             qgv.build()
 
+    def edit_node(node):
+        nodeID = node.getID()
+        dlg = QDialog()
+        dlg.setWindowTitle('Edit Node')
+        dlg.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)  # remove close button
+        dlg.ok = False
+        dlg.OK = True
+        dlg.node_name = ""
+        dlg.node_time = ""
+        dlg.node_desc = ""
+        dlg.node_img = ""
+        dlg.node_team = ""
+        # Layouts
+        main_layout = QVBoxLayout()
+        l = QFormLayout()
+        buttons_layout = QHBoxLayout()
+        main_layout.addLayout(l)
+        main_layout.addLayout(buttons_layout)
+        dlg.setLayout(main_layout)
+
+        if (nodeDic[nodeID]["name"]):
+            leNodeName = QLineEdit(nodeDic[nodeID]["name"])
+        else:
+            leNodeName = QLineEdit()
+        if (nodeDic[nodeID]["time"]):
+            leNodeTime = QLineEdit(nodeDic[nodeID]["time"])
+        else:
+            leNodeTime = QLineEdit()
+        if (nodeDic[nodeID]["description"]):
+            leNodeDesc = QLineEdit(nodeDic[nodeID]["description"])
+        else:
+            leNodeDesc = QLineEdit()
+        cbxNodeType = QComboBox()
+
+        icon = node.getIcon()
+        # If there is a custom icon directory set, show it, else leave blank for default icon
+        if (icon != redTeamIcon and icon != blueTeamIcon and icon != whiteTeamIcon):
+            leImagePath = QLineEdit(icon)
+        else:
+            leImagePath = QLineEdit()
+        pbOK = QPushButton()
+        pbCancel = QPushButton()
+
+        # Place current node's team as the first selection in the comboBox
+        if (nodeDic[nodeID]["team"] == "blue"):
+            cbxNodeType.addItems(["blue", "red", "white"])
+        elif (nodeDic[nodeID]["team"] == "white"):
+            cbxNodeType.addItems(["white", "blue", "red"])
+        else:
+            cbxNodeType.addItems(["red", "blue", "white"])
+        pbOK.setText("&OK")
+        pbCancel.setText("&Cancel")
+
+        l.setWidget(0, QFormLayout.LabelRole, QLabel("Node ID"))
+        l.setWidget(0, QFormLayout.FieldRole, QLabel(nodeID))
+        l.setWidget(1, QFormLayout.LabelRole, QLabel("Node Name"))
+        l.setWidget(1, QFormLayout.FieldRole, leNodeName)
+        l.setWidget(2, QFormLayout.LabelRole, QLabel("Node Time-Stamp"))
+        l.setWidget(2, QFormLayout.FieldRole, leNodeTime)
+        l.setWidget(3, QFormLayout.LabelRole, QLabel("Node Description"))
+        l.setWidget(3, QFormLayout.FieldRole, leNodeDesc)
+        l.setWidget(4, QFormLayout.LabelRole, QLabel("Node Team"))
+        l.setWidget(4, QFormLayout.FieldRole, cbxNodeType)
+        l.setWidget(5, QFormLayout.LabelRole, QLabel("Icon Image"))
+        l.setWidget(5, QFormLayout.FieldRole, leImagePath)
+
+        def ok():
+            dlg.OK = True
+            dlg.node_name = leNodeName.text()
+            dlg.node_time = leNodeTime.text()
+            dlg.node_desc = leNodeDesc.text()
+            dlg.node_img = ""
+            if (leImagePath.text()):
+                dlg.node_img = leImagePath.text()
+            dlg.node_team = cbxNodeType.currentText()
+            dlg.close()
+
+        def cancel():
+            dlg.OK = False
+            dlg.close()
+
+        pbOK.clicked.connect(ok)
+        pbCancel.clicked.connect(cancel)
+
+        buttons_layout.addWidget(pbOK)
+        buttons_layout.addWidget(pbCancel)
+        dlg.exec_()
+
+        # Adds changes to node Dictionary and graph if OK is selected
+        if dlg.OK:
+            # Edit node in Dictionary
+            nodeDic[nodeID] = {
+                "name": dlg.node_name,
+                "team": dlg.node_team,
+                "time": dlg.node_time,
+                "description": dlg.node_desc
+            }
+            # Edit node in graph
+            nodeText = ""
+            if (showNodeID):
+                nodeText += newNodeID
+            if (showNodeName and dlg.node_name != ""):
+                nodeText += "\n" + dlg.node_name
+            if (showNodeTime and dlg.node_time != ""):
+                nodeText += "\n" + dlg.node_time
+            if (showNodeDesc and dlg.node_desc != ""):
+                nodeText += "\n" + dlg.node_desc
+            if (dlg.node_img != ""):
+                team = dlg.node_img
+            elif (dlg.node_team == "red"):
+                team = redTeamIcon
+            elif (dlg.node_team == "blue"):
+                team = blueTeamIcon
+            else:
+                team = whiteTeamIcon
+            node.setText(nodeText)
+            node.setIcon(team)
+
+            print("Edited node with NodeID: " + nodeID)
+            qgv.build()
 
     def rem_node():
         qgv.manipulation_mode = QGraphVizManipulationMode.Node_remove_Mode
@@ -372,13 +602,11 @@ if __name__ == "__main__":
             btn.setChecked(False)
         btnRemNode.setChecked(True)
 
-
     def rem_edge():
         qgv.manipulation_mode = QGraphVizManipulationMode.Edge_remove_Mode
         for btn in buttons_list:
             btn.setChecked(False)
         btnRemEdge.setChecked(True)
-
 
     def add_edge():
         qgv.manipulation_mode = QGraphVizManipulationMode.Edges_Connect_Mode
@@ -386,76 +614,17 @@ if __name__ == "__main__":
             btn.setChecked(False)
         btnAddEdge.setChecked(True)
 
-
-    # def add_subgraph():
-    #     dlg = QDialog()
-    #     dlg.ok = False
-    #     dlg.subgraph_name = ""
-    #     dlg.subgraph_label = ""
-    #     dlg.subgraph_type = "None"
-    #     # Layouts
-    #     main_layout = QVBoxLayout()
-    #     l = QFormLayout()
-    #     buttons_layout = QHBoxLayout()
-    #
-    #     main_layout.addLayout(l)
-    #     main_layout.addLayout(buttons_layout)
-    #     dlg.setLayout(main_layout)
-    #
-    #     leSubgraphName = QLineEdit()
-    #     leSubgraphLabel = QLineEdit()
-    #
-    #     pbOK = QPushButton()
-    #     pbCancel = QPushButton()
-    #
-    #     pbOK.setText("&OK")
-    #     pbCancel.setText("&Cancel")
-    #
-    #     l.setWidget(0, QFormLayout.LabelRole, QLabel("Subgraph Name"))
-    #     l.setWidget(0, QFormLayout.FieldRole, leSubgraphName)
-    #     l.setWidget(1, QFormLayout.LabelRole, QLabel("Subgraph Label"))
-    #     l.setWidget(1, QFormLayout.FieldRole, leSubgraphLabel)
-    #
-    #     def ok():
-    #         dlg.OK = True
-    #         dlg.subgraph_name = leSubgraphName.text()
-    #         dlg.subgraph_label = leSubgraphLabel.text()
-    #         dlg.close()
-    #
-    #     def cancel():
-    #         dlg.OK = False
-    #         dlg.close()
-    #
-    #     pbOK.clicked.connect(ok)
-    #     pbCancel.clicked.connect(cancel)
-    #
-    #     buttons_layout.addWidget(pbOK)
-    #     buttons_layout.addWidget(pbCancel)
-    #     dlg.exec_()
-    #
-    #     if dlg.OK and dlg.subgraph_name != '':
-    #         qgv.addSubgraph(qgv.engine.graph, dlg.subgraph_name, subgraph_type=GraphType.SimpleGraph,
-    #                         label=dlg.subgraph_label)
-    #         qgv.build()
-    #
-    #
-    # def rem_subgraph():
-    #     qgv.manipulation_mode = QGraphVizManipulationMode.Subgraph_remove_Mode
-    #     for btn in buttons_list:
-    #         btn.setChecked(False)
-    #     btnRemSubGraph.setChecked(True)
-
-
     # Add buttons
-    btnNew = QPushButton("New")
-    btnNew.clicked.connect(new)
+    #btnNew = QPushButton("New")
+    #btnNew.clicked.connect(new)
+
     btnOpen = QPushButton("Open")
     btnOpen.clicked.connect(load)
 
     btnSave = QPushButton("Save")
     btnSave.clicked.connect(save)
 
-    hpanel.addWidget(btnNew)
+    #hpanel.addWidget(btnNew)
     hpanel.addWidget(btnOpen)
     hpanel.addWidget(btnSave)
 
@@ -489,16 +658,6 @@ if __name__ == "__main__":
     btnRemEdge.clicked.connect(rem_edge)
     hpanel.addWidget(btnRemEdge)
     buttons_list.append(btnRemEdge)
-
-    # btnAddSubGraph = QPushButton("Add Subgraph")
-    # btnAddSubGraph.clicked.connect(add_subgraph)
-    # hpanel.addWidget(btnAddSubGraph)
-    #
-    # btnRemSubGraph = QPushButton("Rem Subgraph")
-    # btnRemSubGraph.setCheckable(True)
-    # btnRemSubGraph.clicked.connect(rem_subgraph)
-    # hpanel.addWidget(btnRemSubGraph)
-    # buttons_list.append(btnRemSubGraph)
 
     w.showMaximized()
 

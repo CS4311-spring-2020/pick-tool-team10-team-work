@@ -1,14 +1,10 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
-Author: Saifeddine ALOUI
-Description:
-Main Class to QGraphViz tool
-"""
 from PyQt5.QtWidgets import QApplication, QWidget, QScrollArea, QSizePolicy
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPainterPath, QImage, QLinearGradient, QFont
 from PyQt5.QtCore import Qt, QRect, QRectF
+from PyQt5.QtGui import *
 import os
 import sys
 import enum
@@ -252,6 +248,17 @@ class QGraphViz_Core(QWidget):
     def saveAsJson(self, filename):
         self.parser.toJSON(filename, self.engine.graph)
 
+    def saveAsJpg(self, filename):
+        print('save as jpg to '+filename+".jpg")
+        p = QPixmap(self.size())
+        self.render(p)
+        p.save(filename)
+
+    def saveAsPng(self, filename):
+        print('save as png to '+filename+".png")
+        p = QPixmap(self.size())
+        self.render(p)
+        p.save(filename)
 
     # ================== Helper methods ==================
     def findSubNode(self, graph, x, y):
@@ -723,8 +730,7 @@ class QGraphViz_Core(QWidget):
                                 gpos[0]-40/2,
                                 gpos[1]-40/2,
                                 40,  # set size of icon images 40x40
-                                40),
-                            QImage(img_path))
+                                40),QImage(img_path))
                 else:
                     painter.drawEllipse(
                                 gpos[0]-node.size[0]/2,
@@ -929,6 +935,12 @@ class QGraphViz(QScrollArea):
 
     def saveAsJson(self, filename):
         self.core.saveAsJson(filename)
+
+    def saveAsJpg(self, filename):
+        self.core.saveAsJpg(filename)
+
+    def saveAsPng(self, filename):
+        self.core.saveAsPng(filename)
 
     # ===== events
     def resizeEvent(self, event):

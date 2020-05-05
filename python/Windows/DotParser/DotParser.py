@@ -1,11 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
-Author: Saifeddine ALOUI
-Description:
-Dot perser implementation
-"""
 from DotParser.Graph import Graph, GraphType
 from DotParser.Node import Node
 from DotParser.Edge import Edge

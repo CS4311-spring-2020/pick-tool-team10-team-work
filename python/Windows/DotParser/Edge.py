@@ -1,12 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
-Author: Saifeddine ALOUI
-Description:
-Dot perser implementation
-"""
-
 class Edge():
     """
     Describes edges that connect nodes
@@ -25,4 +19,8 @@ class Edge():
         edge_dic["dest"]=self.dest.name
         edge_dic["kwargs"]=self.kwargs
         return edge_dic
-    
+
+    def getSource(self):
+        return self.source
+    def getDest(self):
+        return self.dest

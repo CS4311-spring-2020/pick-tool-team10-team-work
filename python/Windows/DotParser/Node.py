@@ -1,11 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
-Author: Saifeddine ALOUI
-Description:
-Dot perser implementation
-"""
 from PyQt5.QtGui import QFontMetrics, QFont
 class Node():
     """
@@ -44,3 +39,15 @@ class Node():
 
     def getID(self):
         return self.name
+
+    def getIcon(self):
+        return self.kwargs["shape"]
+
+    def setText(self, nodeText):
+        self.kwargs["text"] = nodeText
+
+    def setIcon(self, dir):
+        self.kwargs["shape"] = dir
+
+    def getPos(self):
+        return self.pos
