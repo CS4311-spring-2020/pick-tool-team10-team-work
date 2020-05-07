@@ -267,7 +267,7 @@ class NavInputInterface:
     def checkbox_creator_blue_navi_clicked():
         checkbox_blue: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_blue_navi
         checkbox_blue_state: bool = checkbox_blue.isChecked()
-        condition: dict = {'creator': 'blue'}
+        condition: dict = {'creator': 'Blue'}
         if checkbox_blue_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_blue_state is False:  # unchecked state
@@ -277,7 +277,7 @@ class NavInputInterface:
     def checkbox_creator_red_navi_clicked():
         checkbox_red: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_red_navi
         checkbox_red_state: bool = checkbox_red.isChecked()
-        condition: dict = {'creator': 'red'}
+        condition: dict = {'creator': 'Red'}
         if checkbox_red_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_red_state is False:  # unchecked state
@@ -287,7 +287,7 @@ class NavInputInterface:
     def checkbox_creator_white_navi_clicked():
         checkbox_white: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_white_navi
         checkbox_white_state: bool = checkbox_white.isChecked()
-        condition: dict = {'creator': 'white'}
+        condition: dict = {'creator': 'White'}
         if checkbox_white_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_white_state is False:  # unchecked state
@@ -297,7 +297,7 @@ class NavInputInterface:
     def checkbox_eventtype_blue_navi_clicked():
         checkbox_blue: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_blue_navi
         checkbox_blue_state: bool = checkbox_blue.isChecked()
-        condition: dict = {'eventtype': 'blue'}
+        condition: dict = {'eventtype': 'Blue'}
         if checkbox_blue_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_blue_state is False:  # unchecked state
@@ -307,7 +307,7 @@ class NavInputInterface:
     def checkbox_eventtype_red_navi_clicked():
         checkbox_red: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_red_navi
         checkbox_red_state: bool = checkbox_red.isChecked()
-        condition: dict = {'eventtype': 'red'}
+        condition: dict = {'eventtype': 'Red'}
         if checkbox_red_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_red_state is False:  # unchecked state
@@ -317,7 +317,7 @@ class NavInputInterface:
     def checkbox_eventtype_white_navi_clicked():
         checkbox_white: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_white_navi
         checkbox_white_state: bool = checkbox_white.isChecked()
-        condition: dict = {'eventtype': 'white'}
+        condition: dict = {'eventtype': 'White'}
         if checkbox_white_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_white_state is False:  # unchecked state

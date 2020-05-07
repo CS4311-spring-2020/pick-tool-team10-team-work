@@ -417,6 +417,10 @@ if __name__ == "__main__":
 
     def updateText():
         global nodeDic
+        #global showNodeID
+        #global showNodeName
+        #global showNodeTime
+        #global showNodeDesc
         print("updating Text")
         for nodeID, nodeInfo in nodeDic.items():
             node = nodeDic[nodeID]["node"]
