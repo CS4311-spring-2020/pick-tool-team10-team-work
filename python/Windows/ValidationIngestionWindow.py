@@ -18,7 +18,7 @@ class ValidationIngestionWindow(QMainWindow):
         super().__init__()
         self.completed = 0
         self.setWindowTitle('Validation and Ingestion Process')
-        self.setFixedSize(1000, 600)
+        self.setFixedSize(1000, 700)
         mainwidget = QWidget()
         self.setCentralWidget(mainwidget)
         mainlayout = QVBoxLayout()

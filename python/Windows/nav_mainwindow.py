@@ -1,6 +1,6 @@
 import Windows.nav_input_interface as nii
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QStyleFactory, QAbstractItemView, QWidget, QMenu
+from PyQt5.QtWidgets import QMainWindow
 
 
 class NavMainWindow(QMainWindow):
@@ -604,14 +604,3 @@ class NavMainWindow(QMainWindow):
         item = self.tablewidget_navi.horizontalHeaderItem(5)
         item.setText(_translate("mainwindow_navigation", "ID"))
         self.tablewidget_navi.setColumnHidden(5, True)
-
-
-if __name__ == "__main__":
-    import sys
-
-    app = QtWidgets.QApplication(sys.argv)
-    app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-    app.setStyle(QStyleFactory.create('Fusion'))
-    ui = NavMainWindow()
-    ui.show()
-    sys.exit(app.exec_())

@@ -1,21 +1,12 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'nav_timefilter.ui'
-#
-# Created by: PyQt5 UI code generator 5.14.1
-#
-# WARNING! All changes made in this file will be lost!
-
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QDialog
-from UserObjects.qstandarditem_datetime import QStandardItemDateTime
 from Dialogs.timefilter_input_interface import TimefilterInputInterface
 
 
 class TimefilterDialog(QDialog):
-    def __init__(self, datetime_item: QStandardItemDateTime):
+    def __init__(self, timefilter_id: str):
         super().__init__()
-        self.datetime_item = datetime_item
+        self.timefilter_id = timefilter_id
 
         self.setObjectName("timefilter_dialog")
         self.setWindowModality(QtCore.Qt.ApplicationModal)
@@ -98,6 +89,17 @@ class TimefilterDialog(QDialog):
         self.button_cancel_tfil.setObjectName("button_cancel_tfil")
         self.hl_returnbuttons_tfil.addWidget(self.button_cancel_tfil)
 
+        self.button_delete_tfil = QtWidgets.QPushButton(self)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.button_delete_tfil.sizePolicy().hasHeightForWidth())
+        self.button_delete_tfil.setSizePolicy(sizePolicy)
+        self.button_delete_tfil.setMinimumWidth(100)
+        self.button_delete_tfil.setAutoDefault(False)
+        self.button_delete_tfil.setObjectName("button_delete_tfil")
+        self.hl_returnbuttons_tfil.addWidget(self.button_delete_tfil)
+
         self.button_ok_tfil = QtWidgets.QPushButton(self)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -123,5 +125,6 @@ class TimefilterDialog(QDialog):
         self.label_starttime_tfil.setText(_translate("timefilter_dialog", "Start Time"))
         self.label_endtime_tfil.setText(_translate("timefilter_dialog", "End Time"))
         self.button_cancel_tfil.setText(_translate("timefilter_dialog", "Cancel"))
+        self.button_delete_tfil.setText(_translate("timefilter_dialog", "Delete"))
         self.button_ok_tfil.setText(_translate("timefilter_dialog", "Ok"))
 

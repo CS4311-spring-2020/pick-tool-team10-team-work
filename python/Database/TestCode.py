@@ -64,6 +64,9 @@ DatabaseInterface.delete_vectors_collection()
 DatabaseInterface.delete_log_entries_all()
 DatabaseInterface.delete_log_entries_collection()
 
+DatabaseInterface.delete_time_filters_all()
+DatabaseInterface.delete_time_filters_collection()
+
 
 #return_item = NavDatabaseInterface.create_logentry_item(list_number=1, timestamp='123.21',
                                                         #event='event01', vector='vector1',

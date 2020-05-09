@@ -1,15 +1,5 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'vector_configuration.ui'
-#
-# Created by: PyQt5 UI code generator 5.14.1
-#
-# WARNING! All changes made in this file will be lost!
-
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog
-
 from Dialogs.vectorconfig_input_interface import VectorConfigInputInterface
 
 
@@ -64,6 +54,34 @@ class VectorConfigDialog(QDialog):
         self.hl_add_vc.addWidget(self.lineedit_vectordescription_vc)
 
         self.vl_all_vc.addLayout(self.hl_add_vc)
+
+        spacerItem3 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.vl_all_vc.addItem(spacerItem3)
+
+        self.hl_confirmcancel_vc = QtWidgets.QHBoxLayout()
+        self.hl_confirmcancel_vc.setObjectName("hl_confirmcancel_vc")
+
+        self.button_confirm_vc = QtWidgets.QPushButton(self)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.button_confirm_vc.sizePolicy().hasHeightForWidth())
+        self.button_confirm_vc.setSizePolicy(sizePolicy)
+        self.button_confirm_vc.setAutoDefault(False)
+        self.button_confirm_vc.setObjectName("button_confirm_vc")
+        self.hl_confirmcancel_vc.addWidget(self.button_confirm_vc)
+
+        self.button_cancel_vc = QtWidgets.QPushButton(self)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.button_cancel_vc.sizePolicy().hasHeightForWidth())
+        self.button_cancel_vc.setSizePolicy(sizePolicy)
+        self.button_cancel_vc.setAutoDefault(False)
+        self.button_cancel_vc.setObjectName("button_cancel_vc")
+        self.hl_confirmcancel_vc.addWidget(self.button_cancel_vc)
+
+        self.vl_all_vc.addLayout(self.hl_confirmcancel_vc)
 
         spacerItem1 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.vl_all_vc.addItem(spacerItem1)
@@ -151,6 +169,8 @@ class VectorConfigDialog(QDialog):
         self.button_deletevector_vc.setText(_translate("vectorconfiguration_dialog", "Delete Vector"))
         self.button_editvector_vc.setText(_translate("vectorconfiguration_dialog", "Edit Vector"))
         self.button_ok_vc.setText(_translate("vectorconfiguration_dialog", "Ok"))
+        self.button_confirm_vc.setText(_translate("vectorconfiguration_dialog", "Confirm"))
+        self.button_cancel_vc.setText(_translate("vectorconfiguration_dialog", "Cancel"))
         item = self.tablewidget_vectors_vc.horizontalHeaderItem(0)
         item.setText(_translate("vectorconfiguration_dialog", ""))
         item = self.tablewidget_vectors_vc.horizontalHeaderItem(1)

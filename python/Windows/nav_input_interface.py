@@ -1,18 +1,12 @@
-# from PyQt5 import QtCore, QtGui
-import os
-import subprocess
-
 from PyQt5.QtCore import QDateTime, QModelIndex, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QMainWindow, QStyleFactory, QAbstractItemView, QCheckBox, QErrorMessage, QMessageBox, \
-    QListView, QDialog, QDateTimeEdit, QTableWidget, QTableWidgetItem, QPushButton, QLineEdit, QComboBox
-
-import Dialogs.timefilter_dialog as td
+from PyQt5.QtWidgets import QCheckBox, QMessageBox, QListView, QTableWidget, QTableWidgetItem, QPushButton, QLineEdit, \
+    QComboBox
 from Database.databse_interface import DatabaseInterface
+from Dialogs.timefilter_dialog import TimefilterDialog
 from Windows.mainwindow_vectortableview import Ui_mainwindow_vectortableview
 from Windows.nav_interface_style import UiStyle
 #from Windows.nav_mainwindow import NavMainWindow
-from UserObjects.qstandarditem_datetime import QStandardItemDateTime
 from Dialogs.vectorconfig_dialog import VectorConfigDialog
 
 
@@ -30,10 +24,6 @@ class NavInputInterface:
         NavInputInterface.checkbox_setup()
         NavInputInterface.button_setup()
         NavInputInterface.listview_setup()
-
-        #NavInputInterface.nav_mainwindow.tablewidget_navi.cellChanged.connect(
-            #avInputInterface.logentries_table_cell_changed)
-
         NavInputInterface.refresh_logentries_table(search_type='condition')
 
     @staticmethod
@@ -119,9 +109,7 @@ class NavInputInterface:
 
     @staticmethod
     def listview_setup():
-        # NavInputInterface.nav_mainwindow.listview_location_navi.setEditTriggers(QAbstractItemView.DoubleClicked)
         model = QStandardItemModel()
-        # model.setItemPrototype(QStandardItem())
         model.itemChanged.connect(NavInputInterface.listview_location_navi_item_change)
         NavInputInterface.nav_mainwindow.listview_location_navi.setModel(model)
         NavInputInterface.refresh_listview_locations_navi()
@@ -129,37 +117,22 @@ class NavInputInterface:
         NavInputInterface.nav_mainwindow.listview_timefilter_navi.doubleClicked.connect(
             NavInputInterface.listview_timefilter_navi_doubleclicked)
         model = QStandardItemModel()
-        model.setItemPrototype(QStandardItemDateTime(str, str, str))
         model.itemChanged.connect(NavInputInterface.listview_timefilter_navi_item_change)
         NavInputInterface.nav_mainwindow.listview_timefilter_navi.setModel(model)
+        NavInputInterface.refresh_listview_timefilters_navi()
 
-        # NavInputInterface.nav_mainwindow.listview_vectors_navi.setEditTriggers(QAbstractItemView.DoubleClicked)
         model = QStandardItemModel()
-        #model.setItemPrototype(QStandardItem())
         model.itemChanged.connect(NavInputInterface.listview_vectors_navi_item_change)
         NavInputInterface.nav_mainwindow.listview_vectors_navi.setModel(model)
         NavInputInterface.refresh_listview_vectors_navi()
 
     @staticmethod
     def listview_timefilter_navi_doubleclicked(index: QModelIndex):
-        datetime_item = index.model().itemFromIndex(index)
-        timefilter_dialog = td.TimefilterDialog(datetime_item)
-        if timefilter_dialog.exec() == QDialog.Accepted:
-            index.model().itemFromIndex(index).start_datetime = timefilter_dialog.datetimeedit_starttime_tfil.dateTime()
-            index.model().itemFromIndex(index).end_datetime = timefilter_dialog.datetimeedit_endtime_tfil.dateTime()
-            index.model().itemFromIndex(index).setText(timefilter_dialog.linedit_timefiltername_tfil.text())
-            print("Dialog accepted")
-        else:
-            print("rejected")
-
-    @staticmethod
-    def listview_timefilter_navi_add_item(start_datetime: QDateTime, end_datetime: QDateTime):
-        # if the time filter length is not equal to the db length, redo table
-        item = QStandardItemDateTime('user_time_filter', start_datetime, end_datetime)
-        item.setCheckable(True)
-        item.setEditable(False)
-        NavInputInterface.nav_mainwindow.listview_timefilter_navi.model().appendRow(item)
-        # now add to database
+        timefilter_listitem: QStandardItem = index.model().itemFromIndex(index)
+        timefilter_item: dict = DatabaseInterface.find_one_time_filters_by_id(timefilter_listitem.time_filter_id)
+        timefilter_dialog = TimefilterDialog(str(timefilter_item['_id']))
+        timefilter_dialog.exec()
+        NavInputInterface.refresh_listview_timefilters_navi()
 
     @staticmethod  # COMPLETE
     def listview_location_navi_item_change(item: QStandardItem):
@@ -170,10 +143,8 @@ class NavInputInterface:
         item_state: Qt.CheckState = item.checkState()
         if item_state == Qt.Checked:
             NavInputInterface.log_entries_conditions.append(condition)
-            # print('Checked State')
         elif item_state == Qt.Unchecked:
             NavInputInterface.log_entries_conditions.remove(condition)
-            # print('Unchecked State')
 
     @staticmethod
     def listview_timefilter_navi_item_change(item):
@@ -188,10 +159,8 @@ class NavInputInterface:
         item_state: Qt.CheckState = item.checkState()
         if item_state == Qt.Checked:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
-            # print('Checked State')
         elif item_state == Qt.Unchecked:  # unchecked state
             NavInputInterface.log_entries_conditions.remove(condition)
-            # print('Unchecked State')
 
     @staticmethod
     def checkbox_applyfilter_navi_clicked():
@@ -207,8 +176,6 @@ class NavInputInterface:
             NavInputInterface.set_enable_filter_checkboxes(True)
             NavInputInterface.set_enable_flag = False
             NavInputInterface.refresh_logentries_table()
-        else:
-            print('Error State')
 
     @staticmethod  # COMPLETE
     def checkbox_listnumber_navi_clicked():
@@ -267,7 +234,7 @@ class NavInputInterface:
     def checkbox_creator_blue_navi_clicked():
         checkbox_blue: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_blue_navi
         checkbox_blue_state: bool = checkbox_blue.isChecked()
-        condition: dict = {'creator': 'Blue'}
+        condition: dict = {'creator': 'blue'}
         if checkbox_blue_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_blue_state is False:  # unchecked state
@@ -277,7 +244,7 @@ class NavInputInterface:
     def checkbox_creator_red_navi_clicked():
         checkbox_red: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_red_navi
         checkbox_red_state: bool = checkbox_red.isChecked()
-        condition: dict = {'creator': 'Red'}
+        condition: dict = {'creator': 'red'}
         if checkbox_red_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_red_state is False:  # unchecked state
@@ -287,7 +254,7 @@ class NavInputInterface:
     def checkbox_creator_white_navi_clicked():
         checkbox_white: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_creator_white_navi
         checkbox_white_state: bool = checkbox_white.isChecked()
-        condition: dict = {'creator': 'White'}
+        condition: dict = {'creator': 'white'}
         if checkbox_white_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_white_state is False:  # unchecked state
@@ -297,7 +264,7 @@ class NavInputInterface:
     def checkbox_eventtype_blue_navi_clicked():
         checkbox_blue: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_blue_navi
         checkbox_blue_state: bool = checkbox_blue.isChecked()
-        condition: dict = {'eventtype': 'Blue'}
+        condition: dict = {'eventtype': 'blue'}
         if checkbox_blue_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_blue_state is False:  # unchecked state
@@ -307,7 +274,7 @@ class NavInputInterface:
     def checkbox_eventtype_red_navi_clicked():
         checkbox_red: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_red_navi
         checkbox_red_state: bool = checkbox_red.isChecked()
-        condition: dict = {'eventtype': 'Red'}
+        condition: dict = {'eventtype': 'red'}
         if checkbox_red_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_red_state is False:  # unchecked state
@@ -317,30 +284,34 @@ class NavInputInterface:
     def checkbox_eventtype_white_navi_clicked():
         checkbox_white: QCheckBox = NavInputInterface.nav_mainwindow.checkbox_eventtype_white_navi
         checkbox_white_state: bool = checkbox_white.isChecked()
-        condition: dict = {'eventtype': 'White'}
+        condition: dict = {'eventtype': 'white'}
         if checkbox_white_state is True:  # checked state
             NavInputInterface.log_entries_conditions.append(condition)
         elif checkbox_white_state is False:  # unchecked state
             NavInputInterface.log_entries_conditions.remove(condition)
 
+    # Not implemented
     @staticmethod
     def button_undo_navi_clicked():
         button_undo: QPushButton = NavInputInterface.nav_mainwindow.button_undo_navi
         print(button_undo.text() + ' clicked')
         button_undo.toggle()
 
+    # Not implemented
     @staticmethod
     def button_redo_navi_clicked():
         button_redo: QPushButton = NavInputInterface.nav_mainwindow.button_redo_navi
         print(button_redo.text() + ' clicked')
         button_redo.toggle()
 
+    # Not implemented
     @staticmethod
     def button_push_navi_clicked():
         button_push: QPushButton = NavInputInterface.nav_mainwindow.button_push_navi
         print(button_push.text() + ' clicked')
         button_push.toggle()
 
+    # Not implemented
     @staticmethod
     def button_pull_navi_clicked():
         button_pull: QPushButton = NavInputInterface.nav_mainwindow.button_pull_navi
@@ -350,10 +321,8 @@ class NavInputInterface:
     @staticmethod
     def button_search_navi_clicked():
         button_search: QPushButton = NavInputInterface.nav_mainwindow.button_search_navi
-        print(button_search.text() + ' clicked')
         regex_search_lineedit: QLineEdit = NavInputInterface.nav_mainwindow.linedit_regex_navi
         NavInputInterface.log_entries_regex = regex_search_lineedit.text()
-        print('regex text: ' + NavInputInterface.log_entries_regex)
         button_search.toggle()
         NavInputInterface.refresh_logentries_table(search_type='regex')
 
@@ -374,7 +343,11 @@ class NavInputInterface:
             msg.setWindowTitle("Time Filter Error")
             msg.exec_()
             return
-        NavInputInterface.listview_timefilter_navi_add_item(start_datetime, end_datetime)
+        time_filters_item = DatabaseInterface.create_time_filters_item(name='user_time_filter',
+                                                                       starttime=start_datetime_info,
+                                                                       endtime=end_datetime_info)
+        DatabaseInterface.insert_one_time_filters(time_filters_item)
+        NavInputInterface.refresh_listview_timefilters_navi()
 
     @staticmethod
     def button_vectorconfig_navi_clicked():
@@ -397,6 +370,21 @@ class NavInputInterface:
         #subprocess.run(['python3', file_name])
 
     @staticmethod
+    def refresh_listview_timefilters_navi():
+        time_filters: list = DatabaseInterface.find_time_filters_all()
+        listview_timefilters: QListView = NavInputInterface.nav_mainwindow.listview_timefilter_navi
+        listview_timefilters_model: QStandardItemModel = listview_timefilters.model()
+        listview_timefilters_model.clear()
+        for time_filter in time_filters:
+            time_filter: dict
+            time_filter_item = QStandardItem(time_filter['name'])
+            time_filter_item.time_filter_id = str(time_filter['_id'])
+            print(time_filter['name'], str(time_filter['_id']))
+            time_filter_item.setCheckable(True)
+            time_filter_item.setEditable(False)
+            listview_timefilters_model.appendRow(time_filter_item)
+
+    @staticmethod
     def refresh_listview_vectors_navi():
         vectors: list = DatabaseInterface.find_vectors_all()
         listview_vectors: QListView = NavInputInterface.nav_mainwindow.listview_vectors_navi
@@ -408,9 +396,8 @@ class NavInputInterface:
             vector_item.setCheckable(True)
             vector_item.setEditable(False)
             listview_vectors_model.appendRow(vector_item)
-        NavInputInterface.refresh_logentries_table()
 
-    @staticmethod
+    @staticmethod # Complete
     def refresh_listview_locations_navi():
         log_entries: list = DatabaseInterface.find_log_entries_all()
         listview_locations: QListView = NavInputInterface.nav_mainwindow.listview_location_navi
@@ -447,6 +434,12 @@ class NavInputInterface:
         for index in range(listview_vectors_count):
             item_vector: QStandardItem = listview_vectors_model.item(index)
             item_vector.setEnabled(enabled)
+        listview_timefilters: QListView = NavInputInterface.nav_mainwindow.listview_timefilter_navi
+        listview_timefilters_model: QStandardItemModel = listview_timefilters.model()
+        listview_timefilters_count: int = listview_timefilters_model.rowCount()
+        for index in range(listview_timefilters_count):
+            item_timefilter: QStandardItem = listview_timefilters_model.item(index)
+            item_timefilter.setEnabled(enabled)
         button_vectorconfig = NavInputInterface.nav_mainwindow.button_vectorconfig_navi
         button_vectorconfig.setEnabled(enabled)
         button_search = NavInputInterface.nav_mainwindow.button_search_navi
@@ -455,9 +448,23 @@ class NavInputInterface:
         button_addtimefilter.setEnabled(enabled)
 
     @staticmethod
-    def logentries_table_cell_changed(text):
-        print(text)
-        #print(column)
+    def logentries_vector_combobox_changed(vector_index: int):
+        combobox: QComboBox = NavInputInterface.nav_mainwindow.sender()
+        logentry_id: str = combobox.property("logentry_id")
+        vector_name: str = combobox.itemText(vector_index)
+        vector_id: str = '0'
+        if vector_name == 'None':
+            update_fields: dict = {'vector': vector_name, 'vector_id': vector_id}
+            DatabaseInterface.update_one_log_entries_by_id(log_entries_item_id=logentry_id, update_fields=update_fields)
+            return
+        vectors: list = DatabaseInterface.find_vectors_all()
+        for vector in vectors:
+            vector: dict
+            if vector['name'] == vector_name:
+                vector_id: str = str(vector['_id'])
+                break
+        update_fields: dict = {'vector': vector_name, 'vector_id': vector_id}
+        DatabaseInterface.update_one_log_entries_by_id(log_entries_item_id=logentry_id, update_fields=update_fields)
 
     @staticmethod
     def refresh_logentries_table(search_type: str = None):
@@ -478,11 +485,14 @@ class NavInputInterface:
         vector_names_list: list = list()
         vector_names_list.append('None')
         for vector in vectors:
+            vector: dict
             vector_name = str(vector['name'])
             vector_id = str(vector['_id'])
             vectors_names_dict[vector_id] = vector_name
             vector_names_list.append(vector_name)
 
+        print(vectors_names_dict)
+        print(vector_names_list)
         counter: int = 0
         for log_entry in log_entries:
             tablewidget_logentries.insertRow(counter)
@@ -492,26 +502,27 @@ class NavInputInterface:
             list_number_item.setFlags(Qt.ItemIsEnabled)
             timestamp_item = QTableWidgetItem(log_entry['timestamp'])
             timestamp_item.setFlags(Qt.ItemIsEnabled)
-
+            event_item = QTableWidgetItem(log_entry['event'])
+            event_item.setFlags(Qt.ItemIsEnabled)
             vector_item = QComboBox()
-            vector_item.setProperty('row', counter)
-            vector_item.currentIndexChanged.connect(
-                NavInputInterface.logentries_table_cell_changed)
+            vector_item.setProperty('logentry_id', str(log_entry['_id']))
+            vector_item.currentIndexChanged.connect(NavInputInterface.logentries_vector_combobox_changed)
             log_entry_vector: str = log_entry['vector']
-            log_entry_vector_id: str = log_entry['vector_id']
+            log_entry_vector_id: str = str(log_entry['vector_id'])
             vector_item.addItems(vector_names_list)
             if log_entry_vector == 'None':
                 vector_item.setCurrentIndex(0)
-            elif log_entry_vector_id in vectors_names_dict:
+            elif log_entry_vector_id in vectors_names_dict.keys():
                 vector_item.setCurrentIndex(vector_names_list.index(vectors_names_dict[log_entry_vector_id]))
-
+            else:
+                vector_item.setCurrentIndex(0)
             logentryid_item = QTableWidgetItem(str(log_entry['_id']))
             logentryid_item.setFlags(Qt.ItemIsEnabled)
 
             tablewidget_logentries.setItem(counter, 0, checkbox_item)
             tablewidget_logentries.setItem(counter, 1, list_number_item)
             tablewidget_logentries.setItem(counter, 2, timestamp_item)  # log entry timestamp column
-            tablewidget_logentries.setItem(counter, 3, QTableWidgetItem(log_entry['event']))  # log entry event column
+            tablewidget_logentries.setItem(counter, 3, event_item)  # log entry event column
             tablewidget_logentries.setCellWidget(counter, 4, vector_item)  # vector column
             tablewidget_logentries.setItem(counter, 5, logentryid_item)
             counter += 1
@@ -520,62 +531,6 @@ class NavInputInterface:
         tablewidget_logentries.setSortingEnabled(True)
 
     @staticmethod
-    def update_logentriesss_tables(search_type: str = None):
-        table_widget: QTableWidget = NavInputInterface.nav_mainwindow.tablewidget_navi
-        table_widget.setSortingEnabled(False)
-        if search_type == 'condition':
-            log_entries: list = DatabaseInterface.find_log_entries_condition(
-                NavInputInterface.log_entries_conditions)
-        elif search_type == 'regex':
-            log_entries: list = DatabaseInterface.find_log_entries_regex(NavInputInterface.log_entries_regex)
-        table_widget.clearContents()
-
-        temp_item = QComboBox()
-        temp_item.addItem('hi')
-        temp_item.addItem('dero')
-
-        counter: int = 0
-        for log_entry in log_entries:
-            table_widget.insertRow(counter)
-            checkbox_item = QCheckBox()
-            checkbox_item.setCheckState(False)
-            list_number_item = QTableWidgetItem(str(log_entry['list_number']))
-            list_number_item.setFlags(Qt.ItemIsEnabled)
-            # list_number_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-            # list_number_item.setCheckState(QtCore.Qt.Unchecked)
-            timestamp_item = QTableWidgetItem(log_entry['timestamp'])
-            timestamp_item.setFlags(Qt.ItemIsEnabled)
-            # vector_item = QTableWidgetItem(log_entry['vector'])
-            # vector_item.setFlags(QtCore.Qt.ItemIsEnabled)
-            vector_item = QComboBox()
-            vector_item.addItem('hi')
-            vector_item.addItem('dero')
-
-            table_widget.setCellWidget(counter, 0, checkbox_item)
-            table_widget.setItem(counter, 1, list_number_item)
-            table_widget.setItem(counter, 2, timestamp_item)  # log entry timestamp column
-            table_widget.setItem(counter, 3, QTableWidgetItem(log_entry['event']))  # log entry event column
-            table_widget.setCellWidget(counter, 4, vector_item)  # vector column
-            counter += 1
-
-        table_widget.setRowCount(len(log_entries))
-        table_widget.setSortingEnabled(True)
-
-    @staticmethod
     def hide_logentries_column(column: int, hide: bool):
         table_widget: QTableWidget = NavInputInterface.nav_mainwindow.tablewidget_navi
         table_widget.setColumnHidden(column, hide)
-
-
-"""
-def button_vectortableview_navi_clicked(self):
-    from mainwindow_vectortableview import Ui_mainwindow_vectortableview
-    self.window = QtWidgets.QMainWindow()
-    self.ui = Ui_mainwindow_vectortableview()
-    self.ui.setupUi(self.window)
-    mainwindow_navigation.hide()
-    self.window.show()
-
-
-self.button_setup()
-"""
