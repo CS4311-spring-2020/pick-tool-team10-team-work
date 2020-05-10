@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
 
-class Ui_mainwindow_vectortableview(QMainWindow):
+class VectorNodeConfigWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setObjectName("mainwindow_vectortableview")

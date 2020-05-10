@@ -10,7 +10,7 @@ import subprocess
 import time
 import os
 
-from .nav_mainwindow import NavMainWindow
+from .nav_mainwindow import NavigationConfigWindow
 
 
 class ValidationIngestionWindow(QMainWindow):
@@ -523,5 +523,5 @@ class ValidationIngestionWindow(QMainWindow):
     #Move on to the next window[Ui_mainwindow_navigation] on ingest button click
     def on_ingest_button_clicked(self):
         self.hide()
-        self.window = NavMainWindow()
+        self.window = NavigationConfigWindow()
         self.window.show()

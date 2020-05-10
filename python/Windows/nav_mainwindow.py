@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
 
-class NavMainWindow(QMainWindow):
+class NavigationConfigWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setObjectName("mainwindow_navigation")
@@ -555,7 +555,7 @@ class NavMainWindow(QMainWindow):
         self.setup_interace()
 
     def setup_interace(self):
-        nii.NavInputInterface.interface_setup(self)
+        nii.NavigationConfigInputInterface.interface_setup(self)
 
     def retranslateUi(self, mainwindow_navigation):
         _translate = QtCore.QCoreApplication.translate

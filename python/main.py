@@ -1,5 +1,5 @@
 from Windows.ProjectConfigWindow import ProjectConfigWindow
-from Windows.mainwindow_vectortableview import Ui_mainwindow_vectortableview
+from Windows.mainwindow_vectortableview import VectorNodeConfigWindow
 
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets
@@ -76,7 +76,7 @@ class MainApp(QMainWindow):
     def on_exisproj_button_clicked(self):
         self.hide()
         MainWindow = QMainWindow()
-        ui = Ui_mainwindow_vectortableview()
+        ui = VectorNodeConfigWindow()
         ui.setupUi(MainWindow)
         self.window = MainWindow
         self.window.show()
